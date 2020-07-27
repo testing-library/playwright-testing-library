@@ -1803,14 +1803,14 @@
     "@sinonjs/commons" "^1.7.0"
 
 "@testing-library/dom@^7.0.4":
-  version "7.20.0"
-  resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-7.20.0.tgz#2bab85e90f0221a56256c5d4741c2a36b7c45f4d"
-  integrity sha512-TywaC+qDGm/Ro34kRYkFQPdT+pxSF4UjZGLIqcGfFQH5IGR43Y7sGLPnkieIW/GNsu337oxNsLUAgpI0JWhXHw==
+  version "7.21.5"
+  resolved "https://registry.yarnpkg.com/@testing-library/dom/-/dom-7.21.5.tgz#d87312efc5039313f9ea246ed722d808f2ffcbb3"
+  integrity sha512-zZqC5T/9Upjs0/3hyrYNpGxw75dr/bLLD27pUdb3WWJ50JHwutvnQ1FJNHbVth9f2hLzEnh7hBdZ9pD++8pJ8g==
   dependencies:
     "@babel/runtime" "^7.10.3"
     "@types/aria-query" "^4.2.0"
     aria-query "^4.2.2"
-    dom-accessibility-api "^0.4.5"
+    dom-accessibility-api "^0.4.6"
     pretty-format "^25.5.0"
 
 "@textlint/ast-node-types@^4.0.3":
@@ -4028,10 +4028,10 @@ doctrine@^3.0.0:
   dependencies:
     esutils "^2.0.2"
 
-dom-accessibility-api@^0.4.5:
-  version "0.4.5"
-  resolved "https://registry.yarnpkg.com/dom-accessibility-api/-/dom-accessibility-api-0.4.5.tgz#d9c1cefa89f509d8cf132ab5d250004d755e76e3"
-  integrity sha512-HcPDilI95nKztbVikaN2vzwvmv0sE8Y2ZJFODy/m15n7mGXLeOKGiys9qWVbFbh+aq/KYj2lqMLybBOkYAEXqg==
+dom-accessibility-api@^0.4.6:
+  version "0.4.6"
+  resolved "https://registry.yarnpkg.com/dom-accessibility-api/-/dom-accessibility-api-0.4.6.tgz#f3f2af68aee01b1c862f37918d41841bb1aaf92a"
+  integrity sha512-qxFVFR/ymtfamEQT/AsYLe048sitxFCoCHiM+vuOdR3fE94i3so2SCFJxyz/RxV69PZ+9FgToYWOd7eqJqcbYw==
 
 dom-serializer@0:
   version "0.2.2"
