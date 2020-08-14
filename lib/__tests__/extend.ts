@@ -54,6 +54,7 @@ describe('lib/extend.ts', () => {
       fail() // eslint-disable-line jest/no-jasmine-globals
     } catch (err) {
       err.message = err.message.replace(/(\s*at .*(\n|$))+/gm, '\n    <stack>:X:X')
+      // eslint-disable-next-line jest/no-try-expect
       expect(err.message).toMatchSnapshot()
     }
   })
