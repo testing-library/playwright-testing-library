@@ -6,11 +6,8 @@ describe('lib/extend.ts', () => {
   let page: playwright.Page
   let document: playwright.ElementHandle
 
-  it('should require without error', async () => {
+  beforeAll(async () => {
     await import('../extend')
-  })
-
-  it('should launch playwright', async () => {
     browser = await playwright.chromium.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']})
     page = await browser.newPage()
     await page.goto(`file://${path.join(__dirname, 'fixtures/page.html')}`)
