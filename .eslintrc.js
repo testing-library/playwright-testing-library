@@ -4,6 +4,7 @@ module.exports = {
   ...config,
   ignorePatterns: ['dom-testing-library.js', 'rollup.input.js'],
   parserOptions: {
-    project: ['tsconfig.eslint.json'],
+    tsconfigRootDir: __dirname,
+    project: ['tsconfig.eslint.json', 'tsconfig.json'],
   },
 }

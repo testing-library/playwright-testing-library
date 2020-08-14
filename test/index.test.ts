@@ -1,6 +1,6 @@
 import * as path from 'path'
 import * as playwright from 'playwright'
-import {getDocument, queries, getQueriesForElement, waitFor, configure} from '..'
+import {getDocument, queries, getQueriesForElement, waitFor, configure} from '../lib'
 
 describe('lib/index.ts', () => {
   let browser: playwright.Browser

@@ -7,7 +7,7 @@ describe('lib/extend.ts', () => {
   let document: playwright.ElementHandle
 
   beforeAll(async () => {
-    await import('../extend')
+    await import('../lib/extend')
 
     browser = await playwright.chromium.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']})
     page = await browser.newPage()
