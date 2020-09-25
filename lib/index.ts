@@ -31,7 +31,7 @@ function mapArgument(o: any): any {
 
 function convertRegExpToProxy(o: any, depth: number): any {
   if (typeof o !== 'object' || !o || depth > 2) return o
-  if (!(o instanceof RegExp)) {
+  if (!o.constructor.toString().includes('function RegExp()')) {
     const copy = {...o}
     for (const key of Object.keys(copy)) {
       copy[key] = convertRegExpToProxy(copy[key], depth + 1)
