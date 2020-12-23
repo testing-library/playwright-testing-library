@@ -8636,9 +8636,9 @@ pkg-up@^3.1.0:
     find-up "^3.0.0"
 
 playwright@^1.4.2:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/playwright/-/playwright-1.5.1.tgz#f5333cbfefaf9cb7213b0c9ca8bc9f3f18efcf16"
-  integrity sha512-FYxrQ2TAmvp5ZnBnc6EJHc1Vt3DmXx8xVDq6rxVVG4YVoNKHYMarHI92zGyDlueN2kKCavrhk4Et9w6jJ5XWaA==
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/playwright/-/playwright-1.7.1.tgz#841638811bc39eb2fed792ffaacbcc959a0aaf5e"
+  integrity sha512-dOSWME42wDedJ/PXv8k0zG0Kxd6d6R2OKA51/05++Z2ISdA4N58gHlWqlVKPDkBog1MI6lu/KNt7QDn19AybWQ==
   dependencies:
     debug "^4.1.1"
     extract-zip "^2.0.1"
