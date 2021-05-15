@@ -1,7 +1,7 @@
 /* eslint-disable func-names, global-require, import/no-dynamic-require */
 
 import {getDocument, getQueriesForElement} from '.'
-import {ElementHandle, IScopedQueryUtils} from './typedefs'
+import {ElementHandle, ScopedQueryMethods} from './typedefs'
 
 let Page
 let ElementHandle // eslint-disable-line @typescript-eslint/no-redeclare
@@ -47,5 +47,5 @@ declare module 'playwright/types/types' {
     getDocument(): Promise<ElementHandle>
   }
 
-  interface ElementHandle extends IScopedQueryUtils {}
+  interface ElementHandle extends ScopedQueryMethods {}
 }

@@ -50,12 +50,10 @@ describe('lib/index.ts', () => {
     expect(await queries.getNodeText(element)).toEqual('Hello h3')
   })
 
-  it('should bind getQueriesForElement', async () => {
-    // FIXME: I think it will take some work to get the types in a
-    // place to prevent @typescript-eslint from flagging this
-    // eslint-disable-next-line @typescript-eslint/unbound-method
+  it.only('should bind getQueriesForElement', async () => {
     const {getByText} = getQueriesForElement(await getDocument(page))
     const element = await getByText('Hello h1')
+    console.log(element)
     expect(await queries.getNodeText(element)).toEqual('Hello h1')
   })
 

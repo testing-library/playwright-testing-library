@@ -1,17 +1,15 @@
 import {
   Matcher,
-  MatcherOptions as MatcherOptions_,
-  SelectorMatcherOptions as SelectorMatcherOptions_,
+  MatcherOptions as TestingLibraryMatcherOptions,
+  SelectorMatcherOptions as TestingLibrarySelectorMatcherOptions,
   waitForOptions,
 } from '@testing-library/dom'
-import {ElementHandle as PlaywrightElementHandle} from 'playwright'
-
-export type ElementHandle = PlaywrightElementHandle<SVGElement | HTMLElement>
+import {ElementHandle} from 'playwright'
 
 type Element = ElementHandle
 
-type MatcherOptions = Omit<MatcherOptions_, 'normalizer'>
-type SelectorMatcherOptions = Omit<SelectorMatcherOptions_, 'normalizer'>
+type MatcherOptions = Omit<TestingLibraryMatcherOptions, 'normalizer'>
+type SelectorMatcherOptions = Omit<TestingLibrarySelectorMatcherOptions, 'normalizer'>
 
 interface RoleMatcherOptions extends MatcherOptions {
   name?: string | RegExp
@@ -21,7 +19,7 @@ interface SelectorRoleMatcherOptions extends SelectorMatcherOptions {
   name?: string | RegExp
 }
 
-interface IQueryMethods {
+interface Queries {
   queryByPlaceholderText(el: Element, m: Matcher, opts?: MatcherOptions): Promise<Element | null>
   queryAllByPlaceholderText(el: Element, m: Matcher, opts?: MatcherOptions): Promise<Element[]>
   getByPlaceholderText(el: Element, m: Matcher, opts?: MatcherOptions): Promise<Element>
@@ -171,18 +169,19 @@ export type BoundFunction<T> = T extends (
   : T extends (a1: any, text: infer P, options: infer Q) => infer R
   ? (text: P, options?: Q) => R
   : never
+
 export type BoundFunctions<T> = {[P in keyof T]: BoundFunction<T[P]>}
 
-export interface IScopedQueryUtils extends BoundFunctions<IQueryMethods> {
-  getQueriesForElement(): IScopedQueryUtils
+export interface ScopedQueryMethods extends BoundFunctions<Queries> {
+  getQueriesForElement(): ScopedQueryMethods
   getNodeText(): Promise<string>
 }
 
-export interface IQueryUtils extends IQueryMethods {
-  getQueriesForElement(): IScopedQueryUtils
+export interface QueryMethods extends Queries {
+  getQueriesForElement(): ScopedQueryMethods
   getNodeText(el: Element): Promise<string>
 }
 
-export interface IConfigureOptions {
+export interface ConfigureOptions {
   testIdAttribute: string
 }

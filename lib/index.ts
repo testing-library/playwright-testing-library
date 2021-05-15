@@ -1,46 +1,73 @@
 import {readFileSync} from 'fs'
 import * as path from 'path'
-import {JSHandle, Page} from 'playwright'
+import {ElementHandle, JSHandle, Page} from 'playwright'
 import waitForExpect from 'wait-for-expect'
 
-import {ElementHandle, IConfigureOptions, IQueryUtils, IScopedQueryUtils} from './typedefs'
+import {ConfigureOptions, QueryMethods, ScopedQueryMethods} from './typedefs'
+import {convertProxyToRegExp, mapArgument, convertRegExpToProxy} from './helpers'
+
+const functionNames: ReadonlyArray<keyof QueryMethods> = [
+  'queryByPlaceholderText',
+  'queryAllByPlaceholderText',
+  'getByPlaceholderText',
+  'getAllByPlaceholderText',
+  'findByPlaceholderText',
+  'findAllByPlaceholderText',
+
+  'queryByText',
+  'queryAllByText',
+  'getByText',
+  'getAllByText',
+  'findByText',
+  'findAllByText',
+
+  'queryByLabelText',
+  'queryAllByLabelText',
+  'getByLabelText',
+  'getAllByLabelText',
+  'findByLabelText',
+  'findAllByLabelText',
+
+  'queryByAltText',
+  'queryAllByAltText',
+  'getByAltText',
+  'getAllByAltText',
+  'findByAltText',
+  'findAllByAltText',
+
+  'queryByTestId',
+  'queryAllByTestId',
+  'getByTestId',
+  'getAllByTestId',
+  'findByTestId',
+  'findAllByTestId',
+
+  'queryByTitle',
+  'queryAllByTitle',
+  'getByTitle',
+  'getAllByTitle',
+  'findByTitle',
+  'findAllByTitle',
+
+  'queryByRole',
+  'queryAllByRole',
+  'getByRole',
+  'getAllByRole',
+  'findByRole',
+  'findAllByRole',
+
+  'queryByDisplayValue',
+  'queryAllByDisplayValue',
+  'getByDisplayValue',
+  'getAllByDisplayValue',
+  'findByDisplayValue',
+  'findAllByDisplayValue',
+] as const
 
 const domLibraryAsString = readFileSync(
   path.join(__dirname, '../dom-testing-library.js'),
   'utf8',
 ).replace(/process.env/g, '{}')
-
-/* istanbul ignore next */
-function convertProxyToRegExp(o: any, depth: number): any {
-  if (typeof o !== 'object' || !o || depth > 2) return o
-  if (!o.__regex || typeof o.__flags !== 'string') {
-    const copy = {...o}
-    for (const key of Object.keys(copy)) {
-      copy[key] = convertProxyToRegExp(copy[key], depth + 1)
-    }
-    return copy
-  }
-
-  return new RegExp(o.__regex, o.__flags)
-}
-
-/* istanbul ignore next */
-function mapArgument(o: any): any {
-  return convertProxyToRegExp(o, 0)
-}
-
-function convertRegExpToProxy(o: any, depth: number): any {
-  if (typeof o !== 'object' || !o || depth > 2) return o
-  if (!(o instanceof RegExp)) {
-    const copy = {...o}
-    for (const key of Object.keys(copy)) {
-      copy[key] = convertRegExpToProxy(copy[key], depth + 1)
-    }
-    return copy
-  }
-
-  return {__regex: o.source, __flags: o.flags}
-}
 
 const delegateFnBodyToExecuteInPageInitial = `
   ${domLibraryAsString};
@@ -87,11 +114,11 @@ async function covertToElementHandle(handle: JSHandle, asArray: boolean): Promis
   return asArray ? createElementHandleArray(handle) : createElementHandle(handle)
 }
 
-function processNodeText(handles: IHandleSet): Promise<string> {
+function processNodeText(handles: Handles<string>): Promise<string> {
   return handles.containerHandle.evaluate(handles.evaluateFn, ['getNodeText'])
 }
 
-async function processQuery(handles: IHandleSet): Promise<DOMReturnType> {
+async function processQuery(handles: Handles): Promise<DOMReturnType> {
   const {containerHandle, evaluateFn, fnName, argsToForward} = handles
 
   try {
@@ -110,45 +137,53 @@ async function processQuery(handles: IHandleSet): Promise<DOMReturnType> {
   }
 }
 
-interface IHandleSet {
-  containerHandle: ElementHandle
-  // FIXME: Playwright doesn't expose a type for this like Puppeteer does with
-  // `EvaluateFn`. This *should* be something like the `PageFunction` type that
-  // is unfortunately not exported from the Playwright modules.
-  evaluateFn: any
+interface Handles<T> {
+  containerHandle: ElementHandle<T>
+  evaluateFn: Function
   fnName: string
   argsToForward: any[]
 }
 
-function createDelegateFor<T = DOMReturnType>(
-  fnName: keyof IQueryUtils,
-  contextFn?: ContextFn,
-  processHandleFn?: (handles: IHandleSet) => Promise<T>,
-): (...args: any[]) => Promise<T> {
-  // @ts-ignore
-  // eslint-disable-next-line no-param-reassign
-  processHandleFn = processHandleFn || processQuery
+const createDelegateFor = <T = DOMReturnType>(
+  fnName: keyof QueryMethods,
+  elementHandle: ElementHandle<T>,
+): ((...args: any[]) => Promise<T>) =>
+  async function delegate(...args: any[]): Promise<T> {
+    // const containerHandle: ElementHandle = contextFn ? contextFn.apply(this, args) : this
 
-  return async function delegate(...args: any[]): Promise<T> {
-    // @ts-ignore
-    const containerHandle: ElementHandle = contextFn ? contextFn.apply(this, args) : this
+    // // eslint-disable-next-line no-new-func, @typescript-eslint/no-implied-eval
+    // const evaluateFn = new Function('container, [fnName, ...args]', delegateFnBodyToExecuteInPage)
 
-    // @ts-ignore
-    // eslint-disable-next-line no-new-func, @typescript-eslint/no-implied-eval
+    // let argsToForward = args
+    // // Remove the container from the argsToForward since it's always the first argument
+    // if (containerHandle === args[0]) {
+    //   argsToForward = argsToForward.slice(1)
+    // }
+
+    // // Convert RegExp to a special format since they don't serialize well
+    // argsToForward = argsToForward.map(convertRegExpToProxy)
+
+    // return processHandleFn!({fnName, containerHandle, evaluateFn, argsToForward})
+
+    // eslint-disable-next-line @typescript-eslint/no-implied-eval
     const evaluateFn = new Function('container, [fnName, ...args]', delegateFnBodyToExecuteInPage)
 
-    let argsToForward = args
-    // Remove the container from the argsToForward since it's always the first argument
-    if (containerHandle === args[0]) {
-      argsToForward = argsToForward.slice(1)
+    try {
+      const handle = await elementHandle.evaluateHandle(evaluateFn, [fnName, ...args])
+
+      return await covertToElementHandle(handle, fnName.includes('All'))
+    } catch (error) {
+      if (error instanceof Error) {
+        error.message = error.message
+          .replace(/^.*(?=TestingLibraryElementError:)/, '')
+          .replace('[fnName]', `[${fnName}]`)
+
+        error.stack = error.stack?.replace('[fnName]', `[${fnName}]`)
+      }
+
+      throw error
     }
-
-    // Convert RegExp to a special format since they don't serialize well
-    argsToForward = argsToForward.map(convertRegExpToProxy)
-
-    return processHandleFn!({fnName, containerHandle, evaluateFn, argsToForward})
   }
-}
 
 export async function getDocument(_page?: Page): Promise<ElementHandle> {
   // @ts-ignore
@@ -170,7 +205,7 @@ export function wait(
 
 export const waitFor = wait
 
-export function configure(options: Partial<IConfigureOptions>): void {
+export function configure(options: Partial<ConfigureOptions>): void {
   if (!options) {
     return
   }
@@ -185,83 +220,26 @@ export function configure(options: Partial<IConfigureOptions>): void {
   }
 }
 
-export function getQueriesForElement<T>(
-  object: T,
-  contextFn?: ContextFn,
-): T & IQueryUtils & IScopedQueryUtils {
-  const o = object as any
-  // eslint-disable-next-line no-param-reassign
-  if (!contextFn) contextFn = () => o
+export const getQueriesForElement = <T>(element: ElementHandle<T>): ScopedQueryMethods => {
+  const o = functionNames.reduce(
+    (queries, queryName) => ({
+      ...queries,
+      [queryName]: createDelegateFor(queryName, element),
+    }),
+    {} as ScopedQueryMethods,
+  )
 
-  const functionNames: Array<keyof IQueryUtils> = [
-    'queryByPlaceholderText',
-    'queryAllByPlaceholderText',
-    'getByPlaceholderText',
-    'getAllByPlaceholderText',
-    'findByPlaceholderText',
-    'findAllByPlaceholderText',
+  // functionNames.forEach(functionName => {
+  //   o[functionName] = createDelegateFor<T>(functionName, contextFn)
+  // })
 
-    'queryByText',
-    'queryAllByText',
-    'getByText',
-    'getAllByText',
-    'findByText',
-    'findAllByText',
-
-    'queryByLabelText',
-    'queryAllByLabelText',
-    'getByLabelText',
-    'getAllByLabelText',
-    'findByLabelText',
-    'findAllByLabelText',
-
-    'queryByAltText',
-    'queryAllByAltText',
-    'getByAltText',
-    'getAllByAltText',
-    'findByAltText',
-    'findAllByAltText',
-
-    'queryByTestId',
-    'queryAllByTestId',
-    'getByTestId',
-    'getAllByTestId',
-    'findByTestId',
-    'findAllByTestId',
-
-    'queryByTitle',
-    'queryAllByTitle',
-    'getByTitle',
-    'getAllByTitle',
-    'findByTitle',
-    'findAllByTitle',
-
-    'queryByRole',
-    'queryAllByRole',
-    'getByRole',
-    'getAllByRole',
-    'findByRole',
-    'findAllByRole',
-
-    'queryByDisplayValue',
-    'queryAllByDisplayValue',
-    'getByDisplayValue',
-    'getAllByDisplayValue',
-    'findByDisplayValue',
-    'findAllByDisplayValue',
-  ]
-  functionNames.forEach(functionName => {
-    o[functionName] = createDelegateFor(functionName, contextFn)
-  })
-
-  o.getQueriesForElement = () => getQueriesForElement(o, () => o)
-  o.getNodeText = createDelegateFor<string>('getNodeText', contextFn, processNodeText)
+  // o.getQueriesForElement = () => getQueriesForElement(o, () => o)
+  // o.getNodeText = createDelegateFor<string>('getNodeText', contextFn, processNodeText)
 
   return o
 }
 
 export const within = getQueriesForElement
 
-// @ts-ignore
-export const queries: IQueryUtils = {}
+export const queries: QueryMethods = {}
 getQueriesForElement(queries, el => el)
