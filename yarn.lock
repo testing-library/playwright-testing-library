@@ -489,9 +489,9 @@
     strip-json-comments "^3.1.1"
 
 "@hover/javascript@^6.16.0":
-  version "6.16.0"
-  resolved "https://registry.yarnpkg.com/@hover/javascript/-/javascript-6.16.0.tgz#23d292737cc3a93ffa5c1ed92f578dfb7e17a783"
-  integrity sha512-OCctozDLh4+ThvysYCkz8Kj120pks67A7pTfhU5EyXcoCXTqBb9gi7tm+1XgObbKIjQLH03/gpRl0815qyOn0w==
+  version "6.17.1"
+  resolved "https://registry.yarnpkg.com/@hover/javascript/-/javascript-6.17.1.tgz#c2c83b454d2fae1f6112ba367cabbfc48afe52d1"
+  integrity sha512-yHzwW32ZrnfC4U7BA8cLQBBN4ZV7e2N2kV15XtjnEzQ2J6xXpb5aZ0zpW219UEgUOeNQcuyk4xyMliWcs81/YA==
   dependencies:
     "@commitlint/cli" "^12.1.4"
     "@commitlint/config-conventional" "^12.1.4"
@@ -506,7 +506,7 @@
     cross-env "^7.0.3"
     cross-spawn "^7.0.1"
     doctoc "^2.0.1"
-    eslint "^7.30.0"
+    eslint "^7.31.0"
     eslint-config-airbnb-typescript "^12.3.1"
     eslint-config-prettier "^8.3.0"
     eslint-plugin-import "^2.23.4"
@@ -2391,7 +2391,7 @@ eslint-visitor-keys@^2.0.0:
   resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-2.0.0.tgz#21fdc8fbcd9c795cc0321f0563702095751511a8"
   integrity sha512-QudtT6av5WXels9WjIM7qz1XD1cWGvX4gGXvp/zBn9nXG02D0utdU3Em2m/QjTnrsk6bBjmCygl3rmj118msQQ==
 
-eslint@^7.30.0:
+eslint@^7.31.0:
   version "7.31.0"
   resolved "https://registry.yarnpkg.com/eslint/-/eslint-7.31.0.tgz#f972b539424bf2604907a970860732c5d99d3aca"
   integrity sha512-vafgJpSh2ia8tnTkNUkwxGmnumgckLh5aAbLa1xRmIn9+owi8qBNGKL+B881kNKNTy7FFqTEkpNkUvmw0n6PkA==
