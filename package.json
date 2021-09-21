@@ -12,7 +12,7 @@
     "lint": "hover-scripts lint",
     "prepublishOnly": "yarn rebuild && generate-export-aliases",
     "rebuild": "yarn clean && yarn build",
-    "test": "hover-scripts test",
+    "test": "playwright test",
     "validate": "hover-scripts validate 'lint,test --coverage --runInBand --verbose'"
   },
   "husky": {
@@ -52,17 +52,15 @@
     "@rollup/plugin-commonjs": "^19.0.0",
     "@rollup/plugin-node-resolve": "^11.2.0",
     "@rollup/plugin-replace": "^3.0.0",
-    "@types/jest": "^26.0.4",
     "generate-export-aliases": "^1.1.0",
     "husky": "^4.3.8",
-    "playwright": "^1.11.0",
+    "@playwright/test": "^1.14.1",
     "rollup": "^2.0.3",
     "setimmediate": "^1.0.5",
-    "ts-jest": "^27.0.3",
     "typescript": "^3.9.6"
   },
   "peerDependencies": {
-    "playwright": "^1.1.0"
+    "@playwright/test": "^1.14.1"
   },
   "engines": {
     "node": ">=12"

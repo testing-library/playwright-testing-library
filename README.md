@@ -29,8 +29,7 @@
 
 All of your favorite user-centric querying functions from **@testing-library/react** and **@testing-library/dom** available from Playwright!
 
-- Standalone queries — **`playwright-testing-library`** or...
-- Playwright extensions — **`playwright-testing-library/extend`**
+- Queries as a Playwright fixture
 - Asynchronous assertion helper (via **[wait-for-expect](https://github.com/TheBrainFamily/wait-for-expect)**)
 
 ## 🌱 Getting Started
@@ -47,56 +46,30 @@ or
 yarn add --dev playwright-testing-library
 ```
 
-### 2a. Use _standalone queries_
+### 2 Use _queries as a fixture_
 
-```js
-const {webkit} = require('playwright') // or 'firefox' or 'chromium'
-const {getDocument, queries} = require('playwright-testing-library')
+Just include the small fixture
 
-const {getByTestId, getByLabelText} = queries
+```ts
+import {test as baseTest} from '@playwright/test'
 
-const browser = await webkit.launch()
-const page = await browser.newPage()
-
-// Grab ElementHandle for document
-const $document = await getDocument(page)
-
-// Your favorite query methods are available
-const $form = await getByTestId($document, 'my-form')
-
-// Returned elements are ElementHandles too!
-const $email = await getByLabelText($form, 'Email')
-
-// Interact with playwright like usual
-await $email.type('playwright@example.com')
-
-// ...
+const test = baseTest.extend<{
+  queries: IScopedQueryUtils
+}>({
+  queries: queriesFixture,
+})
 ```
 
-### 2b. Use _extensions_
+And now you get the queries scoped to the page document as a fixture for each test.
 
-```js
-const {webkit} = require('playwright') // or 'firefox' or 'chromium'
-require('playwright-testing-library/extend')
-
-const browser = await webkit.launch()
-const page = await browser.newPage()
-
-// Grab document with `getDocument`, which is added to the prototype of `Paqe`
-const $document = await page.getDocument()
-
-// Query methods are added directly to prototype of `ElementHandle`
-const $form = await $document.getByTestId('my-form')
-
-// Scope queries with `getQueriesForElement`
-const {getByLabelText} = $form.getQueriesForElement()
-
-const $email = await getByLabelText('Email')
-
-// Interact with Playwright like usual
-await $email.type('playwright@example.com')
-
-// ...
+```ts
+test('should handle regex matching', async ({queries}) => {
+  const {queryByText} = queries
+  const element = await queryByText(/HeLlO h(1|7)/i)
+  expect(element).toBeTruthy()
+  /* istanbul ignore next */
+  expect(await element.textContent()).toEqual('Hello h1')
+})
 ```
 
 ## 🔌 API

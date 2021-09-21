@@ -4,7 +4,7 @@ import {
   SelectorMatcherOptions as SelectorMatcherOptions_,
   waitForOptions,
 } from '@testing-library/dom'
-import {ElementHandle as PlaywrightElementHandle} from 'playwright'
+import {ElementHandle as PlaywrightElementHandle} from '@playwright/test'
 
 export type ElementHandle = PlaywrightElementHandle<SVGElement | HTMLElement>
 
@@ -160,17 +160,16 @@ interface IQueryMethods {
 }
 
 export type BoundFunction<T> = T extends (
-  attribute: string,
   element: Element,
-  text: infer P,
-  options: infer Q,
+  m: Matcher,
+  opts?: infer O,
+  waitForOpts?: infer WO,
 ) => infer R
-  ? (text: P, options?: Q) => R
-  : T extends (a1: any, text: infer P, options: infer Q, waitForOptions: infer W) => infer R
-  ? (text: P, options?: Q, waitForOptions?: W) => R
-  : T extends (a1: any, text: infer P, options: infer Q) => infer R
-  ? (text: P, options?: Q) => R
+  ? (m: Matcher, opts?: O, waitForOpts?: WO) => R
+  : T extends (element: Element, m: Matcher, opts?: infer O) => infer R
+  ? (m: Matcher, opts?: O) => R
   : never
+
 export type BoundFunctions<T> = {[P in keyof T]: BoundFunction<T[P]>}
 
 export interface IScopedQueryUtils extends BoundFunctions<IQueryMethods> {
