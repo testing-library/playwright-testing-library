@@ -44,7 +44,7 @@
     }
   },
   "dependencies": {
-    "@testing-library/dom": "^7.22.2",
+    "@testing-library/dom": "^8.6.0",
     "wait-for-expect": "^3.0.2"
   },
   "devDependencies": {
