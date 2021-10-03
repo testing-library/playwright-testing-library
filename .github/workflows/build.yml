@@ -74,11 +74,35 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload Coverage / Release / Playwright Test
+      - name: Set flag as to whether we released
+        id: did-release
+        run: echo "::set-output name=released::$(node ./playwright-test/check-package.js)"
+
+      - name: Setup NPM authentication for second publish
+        if: ${{ matrix.node == '14' && matrix.playwright == 'latest' && steps.did-release.outputs.released == 'true' }}
+        run: |
+          cat > .npmrc <<EOF
+           registry=https://registry.npmjs.org/
+           @playwright-testing-library:registry=https://registry.npmjs.org/
+           //registry.npmjs.org/:_authToken=$NPM_TOKEN
+           always-auth=true
+           unsafe-perm=true
+          EOF
+        env:
+          NPM_TOKEN: ${{ secrets.PLAYWRIGHT_TESTING_LIBRARY_TOKEN }}
+
+      - name: Set branch name
+        id: branch
+        run: echo ::set-output name=branch::${GITHUB_REF#refs/*/}
+
+      - name: Release / Playwright Test (latest)
+        if: ${{ matrix.node == '14' && matrix.playwright == 'latest' && steps.did-release.outputs.released == 'true' && steps.branch.outputs.branch == 'main' }}
         run: |
           npm run prepare:playwright-test
-          npm run ci-after-success
-        if: ${{ matrix.node == '14' && matrix.playwright == 'latest' }}
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          npm publish --access=public
+
+      - name: Release / Playwright Test (pre-release)
+        if: ${{ matrix.node == '14' && matrix.playwright == 'latest' && steps.did-release.outputs.released == 'true' && steps.branch.outputs.branch != 'main' }}
+        run: |
+          npm run prepare:playwright-test
+          npm publish --access=public --tag=${{ steps.branch.outputs.branch }}

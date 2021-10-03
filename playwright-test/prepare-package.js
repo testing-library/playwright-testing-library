@@ -2,19 +2,17 @@
 /* eslint-disable no-console */
 
 const fs = require('fs/promises')
-const path = require('path')
 
-const PACKAGE = path.join(__dirname, '..', 'package.json')
+const {PACKAGE, getPackage} = require('./package')
 
 const run = async () => {
-  const package = JSON.parse(await fs.readFile(PACKAGE, {encoding: 'utf-8'}))
-
+  const package = await getPackage()
   const modifiedPackage = {
     ...package,
     name: '@playwright-testing-library/test',
   }
 
-  await fs.writeFile(PACKAGE, JSON.stringify(modifiedPackage, undefined, 2))
+  await fs.writeFile(PACKAGE, `${JSON.stringify(modifiedPackage, undefined, 2)}\n`)
 }
 
 run()
