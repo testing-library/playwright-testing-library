@@ -7,7 +7,7 @@ describe('lib/index.ts', () => {
   let page: playwright.Page
 
   beforeAll(async () => {
-    browser = await playwright.chromium.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']})
+    browser = await playwright.firefox.launch()
     page = await browser.newPage()
     await page.goto(`file://${path.join(__dirname, '../fixtures/page.html')}`)
   })
