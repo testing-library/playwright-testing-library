@@ -2,7 +2,7 @@ import type {PlaywrightTestArgs, TestFixture} from '@playwright/test'
 
 import {getDocument, queries as unscopedQueries} from '.'
 import {queryNames} from './common'
-import type {IScopedQueryUtils as Queries} from './typedefs'
+import type {ScopedQueries as Queries} from './typedefs'
 
 interface TestingLibraryFixtures {
   queries: Queries

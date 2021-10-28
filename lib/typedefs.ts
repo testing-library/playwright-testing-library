@@ -21,7 +21,7 @@ interface SelectorRoleMatcherOptions extends SelectorMatcherOptions {
   name?: string | RegExp
 }
 
-interface IQueryMethods {
+interface QueryMethods {
   queryByPlaceholderText(el: Element, m: Matcher, opts?: MatcherOptions): Promise<Element | null>
   queryAllByPlaceholderText(el: Element, m: Matcher, opts?: MatcherOptions): Promise<Element[]>
   getByPlaceholderText(el: Element, m: Matcher, opts?: MatcherOptions): Promise<Element>
@@ -173,16 +173,16 @@ export type BoundFunction<T> = T extends (
   : never
 export type BoundFunctions<T> = {[P in keyof T]: BoundFunction<T[P]>}
 
-export interface IScopedQueryUtils extends BoundFunctions<IQueryMethods> {
-  getQueriesForElement(): IScopedQueryUtils
+export interface ScopedQueries extends BoundFunctions<QueryMethods> {
+  getQueriesForElement(): ScopedQueries
   getNodeText(): Promise<string>
 }
 
-export interface IQueryUtils extends IQueryMethods {
-  getQueriesForElement(): IScopedQueryUtils
+export interface Queries extends QueryMethods {
+  getQueriesForElement(): ScopedQueries
   getNodeText(el: Element): Promise<string>
 }
 
-export interface IConfigureOptions {
+export interface ConfigurationOptions {
   testIdAttribute: string
 }

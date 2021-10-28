@@ -3,7 +3,7 @@ import * as path from 'path'
 import {JSHandle, Page} from 'playwright'
 import waitForExpect from 'wait-for-expect'
 
-import {ElementHandle, IConfigureOptions, IQueryUtils, IScopedQueryUtils} from './typedefs'
+import {ElementHandle, ConfigurationOptions, Queries, ScopedQueries} from './typedefs'
 import {queryNames} from './common'
 
 const domLibraryAsString = readFileSync(
@@ -88,11 +88,11 @@ async function covertToElementHandle(handle: JSHandle, asArray: boolean): Promis
   return asArray ? createElementHandleArray(handle) : createElementHandle(handle)
 }
 
-function processNodeText(handles: IHandleSet): Promise<string> {
+function processNodeText(handles: HandleSet): Promise<string> {
   return handles.containerHandle.evaluate(handles.evaluateFn, ['getNodeText'])
 }
 
-async function processQuery(handles: IHandleSet): Promise<DOMReturnType> {
+async function processQuery(handles: HandleSet): Promise<DOMReturnType> {
   const {containerHandle, evaluateFn, fnName, argsToForward} = handles
 
   try {
@@ -111,7 +111,7 @@ async function processQuery(handles: IHandleSet): Promise<DOMReturnType> {
   }
 }
 
-interface IHandleSet {
+interface HandleSet {
   containerHandle: ElementHandle
   // FIXME: Playwright doesn't expose a type for this like Puppeteer does with
   // `EvaluateFn`. This *should* be something like the `PageFunction` type that
@@ -122,9 +122,9 @@ interface IHandleSet {
 }
 
 function createDelegateFor<T = DOMReturnType>(
-  fnName: keyof IQueryUtils,
+  fnName: keyof Queries,
   contextFn?: ContextFn,
-  processHandleFn?: (handles: IHandleSet) => Promise<T>,
+  processHandleFn?: (handles: HandleSet) => Promise<T>,
 ): (...args: any[]) => Promise<T> {
   // @ts-ignore
   // eslint-disable-next-line no-param-reassign
@@ -171,7 +171,7 @@ export function wait(
 
 export const waitFor = wait
 
-export function configure(options: Partial<IConfigureOptions>): void {
+export function configure(options: Partial<ConfigurationOptions>): void {
   if (!options) {
     return
   }
@@ -189,7 +189,7 @@ export function configure(options: Partial<IConfigureOptions>): void {
 export function getQueriesForElement<T>(
   object: T,
   contextFn?: ContextFn,
-): T & IQueryUtils & IScopedQueryUtils {
+): T & Queries & ScopedQueries {
   const o = object as any
   // eslint-disable-next-line no-param-reassign
   if (!contextFn) contextFn = () => o
@@ -207,5 +207,5 @@ export function getQueriesForElement<T>(
 export const within = getQueriesForElement
 
 // @ts-ignore
-export const queries: IQueryUtils = {}
+export const queries: Queries = {}
 getQueriesForElement(queries, el => el)
