@@ -1,6 +1,6 @@
-import {IQueryUtils} from './typedefs'
+import {Queries} from './typedefs'
 
-export const queryNames: Array<keyof IQueryUtils> = [
+export const queryNames: Array<keyof Queries> = [
   'queryByPlaceholderText',
   'queryAllByPlaceholderText',
   'getByPlaceholderText',
