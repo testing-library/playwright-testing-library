@@ -55,29 +55,38 @@ yarn add --dev playwright-testing-library
 yarn add --dev @playwright-testing-library/test
 ```
 
-### 2a. Use _Playwright Test [fixture](https://playwright.dev/docs/test-fixtures)_
+### 2a. Use _extend @playwright/test selectors_
+
+### 2a. Use _Playwright Test [fixture](https://playwright.dev/docs/test-fixtures) and [locator](https://playwright.dev/docs/api/class-locator)_
+
+@playwright/test allows you to [extend the selectors](https://playwright.dev/docs/extensibility/#custom-selector-engines) that are available when making a locator.
+
+#### Notes on locators
+
+When using the locators it doesn't make sense to differentiate the queryBy and queryAllBy queries or use the get and find queries since we can leave it to playwright to be angry when you try to click a locator that matches multiple elements. This means that all the selectors added are backed by queryAll.
+
+You can use a Regex in these selectors, but since they are strings remember to escape any special characters as normal.
+
+You can use >> as normal to chain selectors in a locator.
 
 ```ts
 import {test as baseTest} from '@playwright/test'
-import {fixtures, TestingLibraryFixtures} from '@playwright-testing-library/test/fixture'
+import {fixtures} from '@playwright-testing-library/test/fixture'
+import {registerSelectorEngines} from '@playwright-testing-library/test/selectors'
 
-// As only fixture
-const test = baseTest.extend<TestingLibraryFixtures>(fixtures)
+const test = mixinFixtures(baseTest)
 
-// Alternatively, with other fixtures
-interface Fixtures extends TestingLibraryFixtures {
-  // ... additional fixture types
-}
-
-const test = baseTest.extend<Fixtures>({
-  ...fixtures,
-  // ... additional fixtures
-})
+// registers all of the By... selector engines, you can skip this if you don't want to use Locators
+await registerSelectorEngines()
 
 const {expect} = test
 
 // Query methods are available in `test` blocks
-test('my form', ({queries: {getByTestId}}) => {
+test('my form', ({page, queries: {getByTestId}}) => {
+  // the selector engines integrate the queries into playwright locators
+  // the advantage here is that they return locators, and not ElementHandles
+  await page.locator('form >> ByLabelText=/username/i').type('Slartibartfast')
+
   const $form = await getByTestId('my-form')
 
   // Scope queries with `getQueriesForElement`

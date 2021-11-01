@@ -9,14 +9,25 @@
   <label for="label-text-input" data-testid="testid-label">Label A</label>
   <input id="label-text-input" type="text">
 
-  <button role="button">getByRole Test</button>
+  <button>getByRole Test</button>
   <div id="scoped">
     <h3>Hello h3</h3>
   </div>
-
+  <div role="button">actually not a button</div>
+  <button style="display: none;">button</button>
   <table role="presentation">
     <td>Layout table</td>
   </table>
+
+  <form>
+    <label>Login</label>
+    <label for="username-input">Username</label>
+    <input id="username-input" type="text" placeholder="Username" />
+    <label id="password-label">Password</label>
+    <input type="text" aria-labelledby="password-label" value="hunter2" />
+    <button aria-label="Login">Go!</button>
+  </form>
+
 </body>
 
 </html>
