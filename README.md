@@ -10,12 +10,11 @@
 
 <div align="center">
 
-[![Package Version][npm-badge]][npm-link]
 [![Build Status][build-badge]][build-link]
 [![Test Coverage][codecov-badge]][codecov-link]
-[![Dependencies Status][david-badge]][david-link]
-[![MIT License][license-badge]][license-link] <br>
 [![Code Style][prettier-badge]][prettier-link]
+[![Package Version][npm-badge]][npm-link] <br>
+[![MIT License][license-badge]][license-link]
 [![Conventional Commits][conventional-commits-badge]][conventional-commits-link]
 [![Maintenance][maintenance-badge]][maintenance-link]
 
@@ -211,6 +210,11 @@ The **[@testing-library/dom](https://github.com/testing-library/dom-testing-libr
 
 MIT
 
+## Maintenance
+
+This project is actively maintained by engineers at
+[@hoverinc][https://github.com/hoverinc/] 😀.
+
 [codecov-badge]: https://codecov.io/gh/hoverinc/playwright-testing-library/branch/main/graph/badge.svg
 [codecov-link]: https://codecov.io/gh/hoverinc/playwright-testing-library
 [conventional-commits-badge]: https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg
@@ -220,7 +224,7 @@ MIT
 [license-badge]: https://img.shields.io/npm/l/@hover/javascript.svg
 [license-link]: https://github.com/hoverinc/hover-javascript/blob/master/LICENSE
 [maintenance-badge]: https://img.shields.io/badge/maintenance-active-247ddc?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABkAAAAcCAYAAACUJBTQAAAB1ElEQVRIibWWPUtdQRCGH0VNF/wCCVjYCxr/gZWdhYVgLQYbm/wACTYxxA8SSBDtbKwUbfQWkiJFAgkkmHBBY6U2CXaCGlDDG1buxePOnt17bsgD28zOzjtnZvbuRVKR1SFpVdKepEe1njOGnOWCz0q60B1lSa05/oVE2iTNSfqdCZ7lSyWB0NmkSJekeUmXJqzlayWZUJxckUUTJs23mFAjlhNjSdMHfAQ6g54hZUnDdXyN44ek7iKNH4w0PMaeX7pQ8Ox6HQkWww3Dw1hPWoAJ4BxoB4aNR5oB4APQ5vekUdITSceZDLcreyORrGPcfpEL0CBpVNJRwLmUSWLS7NbGpju8FXEteT2qR+jQ9aS3QK2XgUljjXPpRC6iLpYV4KmxRghNVy28Aqb+t4jjLbBhrAH+RcRxZSwBUiINxlIHKZE/xlIHTTlHBDwHjoDPwHtgF/gEnBnvFJVfzSrXkpYyfxKGvIu14F3ONXP1LOWmzEPjpuWl92j55XyQyDnEjRN5AbwD9gMOPkV7tAPMOJE3ZuuOFmOpjS3gGfCdQDl8fgGnGVtzwt8F7wdGqgKOvOmq4iarB3gMjAFlb78qug5MAwehIO4tKViJe4wDP4FSrgfwF/ntR8JxRSf3AAAAAElFTkSuQmCC
-[maintenance-link]: https://github.com/hoverinc/hover-javascript#maintenance
+[maintenance-link]: https://github.com/hoverinc/playwright-testing-library#maintenance
 [npm-badge]: https://img.shields.io/npm/v/playwright-testing-library
 [npm-link]: https://www.npmjs.com/package/playwright-testing-library
 [prettier-badge]: https://img.shields.io/badge/code_style-prettier-ff69b4.svg?logo=prettier
