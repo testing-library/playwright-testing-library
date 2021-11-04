@@ -1,8 +1,10 @@
 version: 2
 updates:
-- package-ecosystem: npm
-  directory: "/"
-  schedule:
-    interval: daily
-  pull-request-branch-name:
-    separator: "-"
+  - package-ecosystem: npm
+    directory: '/'
+    reviewers:
+      - jrolfs
+    schedule:
+      interval: daily
+    pull-request-branch-name:
+      separator: '-'
