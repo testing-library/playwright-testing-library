@@ -213,7 +213,7 @@ MIT
 ## Maintenance
 
 This project is actively maintained by engineers at
-[@hoverinc][https://github.com/hoverinc/] 😀.
+[@hoverinc](https://github.com/hoverinc/) 😀.
 
 [codecov-badge]: https://codecov.io/gh/hoverinc/playwright-testing-library/branch/main/graph/badge.svg
 [codecov-link]: https://codecov.io/gh/hoverinc/playwright-testing-library
