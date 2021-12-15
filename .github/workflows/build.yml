@@ -12,21 +12,9 @@ on:
       - beta
 
 jobs:
-  deduplicate:
-    name: Deduplicate Jobs
-    runs-on: ubuntu-latest
-    outputs:
-      should_skip: ${{ steps.skip_check.outputs.should_skip }}
-    steps:
-      - id: skip_check
-        uses: fkirc/skip-duplicate-actions@master
-        with:
-          concurrent_skipping: same_content_newer
-
   build:
     name: Build + Test + Release / Node ${{ matrix.node }}
     runs-on: ubuntu-latest
-    if: ${{ needs.deduplicate.outputs.should_skip != 'true' }}
     strategy:
       matrix:
         node: ['12', '14', '16']
