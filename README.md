@@ -76,7 +76,7 @@ const test = baseTest.extend<Fixtures>({
 const {expect} = test
 
 // Query methods are available in `test` blocks
-test('my form', ({queries: {getByTestId}}) => {
+test('my form', async ({queries: {getByTestId}}) => {
   const $form = await getByTestId('my-form')
 
   // Scope queries with `getQueriesForElement`
