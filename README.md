@@ -87,8 +87,6 @@ test('my form', async ({queries: {getByTestId}}) => {
   // Interact with Playwright like usual
   await $email.type('playwright@example.com')
 
-  expect($email).toHaveValue('playwright@example.com')
-
   // ...
 })
 ```
