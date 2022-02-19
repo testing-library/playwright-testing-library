@@ -2,7 +2,7 @@ import type {PlaywrightTestArgs, TestFixture} from '@playwright/test'
 
 import {getDocument, queries as unscopedQueries} from '.'
 import {queryNames} from './common'
-import type {ScopedQueries as Queries} from './typedefs'
+import type {FixtureQueries as Queries} from './typedefs'
 
 interface TestingLibraryFixtures {
   queries: Queries
@@ -21,10 +21,13 @@ const fixture: TestFixture<Queries, PlaywrightTestArgs> = async ({page}, use) =>
     }
   })
 
+  queries.getNodeText = async e => unscopedQueries.getNodeText(e)
+
   await use(queries)
 }
 
 const fixtures = {queries: fixture}
 
+export {configure} from '.'
 export {fixture, fixtures}
 export type {Queries, TestingLibraryFixtures}
