@@ -12,37 +12,109 @@ describe('lib/index.ts', () => {
     await page.goto(`file://${path.join(__dirname, '../fixtures/page.html')}`)
   })
 
-  it('should export the utilities', async () => {
+  test('should handle the query* methods', async () => {
+    const document = await getDocument(page)
+    const element = await queries.queryByText(document, 'Hello h1')
+
+    expect(element).toBeTruthy()
+    expect(await element!.textContent()).toEqual('Hello h1')
+  })
+
+  test('should use the new v3 methods', async () => {
+    const document = await getDocument(page)
+    const element = await queries.queryByRole(document, 'presentation')
+
+    expect(element).toBeTruthy()
+    expect(await element!.textContent()).toContain('Layout table')
+  })
+
+  test('should handle regex matching', async () => {
+    const document = await getDocument(page)
+    const element = await queries.getByText(document, /HeLlO h(1|7)/i)
+
+    expect(await element.textContent()).toEqual('Hello h1')
+  })
+
+  test('handles page navigations', async () => {
+    await page.goto(`file://${path.join(__dirname, '../fixtures/page.html')}`)
+
+    const element = await queries.getByText(await getDocument(page), 'Hello h1')
+
+    expect(await element.textContent()).toEqual('Hello h1')
+  })
+
+  test('should handle the queryAll* methods', async () => {
+    const document = await getDocument(page)
+    const elements = await queries.queryAllByText(document, /Hello/)
+
+    expect(elements).toHaveLength(3)
+
+    const text = await Promise.all([
+      page.evaluate(el => el.textContent, elements[0]),
+      page.evaluate(el => el.textContent, elements[1]),
+      page.evaluate(el => el.textContent, elements[2]),
+    ])
+
+    expect(text).toEqual(['Hello h1', 'Hello h2', 'Hello h3'])
+  })
+
+  test('should handle the queryAll* methods with a selector', async () => {
+    const document = await getDocument(page)
+    const elements = await queries.queryAllByText(document, /Hello/, {selector: 'h2'})
+
+    expect(elements).toHaveLength(1)
+
+    const text = await page.evaluate(el => el.textContent, elements[0])
+
+    expect(text).toEqual('Hello h2')
+  })
+
+  test('should handle the getBy* methods with a selector', async () => {
+    const document = await getDocument(page)
+    const element = await queries.getByText(document, /Hello/, {selector: 'h2'})
+
+    const text = await page.evaluate(el => el.textContent, element)
+
+    expect(text).toEqual('Hello h2')
+  })
+
+  it('attaches `getNodeText`', async () => {
     const document = await getDocument(page)
     const element = await queries.getByText(document, 'Hello h1')
+
     expect(await queries.getNodeText(element)).toEqual('Hello h1')
   })
 
-  it('should support custom data-testid attribute name', async () => {
-    configure({testIdAttribute: 'data-id'})
-    const document = await getDocument(page)
-    const element = await queries.getByTestId(document, 'second-level-header')
-    expect(await queries.getNodeText(element)).toEqual('Hello h2')
-  })
+  describe('configuration', () => {
+    afterEach(() => {
+      configure({testIdAttribute: 'data-testid'}) // cleanup
+    })
 
-  it('should support subsequent changing the data-testid attribute names', async () => {
-    configure({testIdAttribute: 'data-id'})
-    configure({testIdAttribute: 'data-new-id'})
-    const document = await getDocument(page)
-    const element = await queries.getByTestId(document, 'first-level-header')
-    expect(await queries.getNodeText(element)).toEqual('Hello h1')
-  })
-
-  it.each([{}, undefined, null, {testIdAttribute: ''}])(
-    'should keep the default data-testid when input passed is invalid',
-    async options => {
+    it('should support custom data-testid attribute name', async () => {
+      configure({testIdAttribute: 'data-id'})
       const document = await getDocument(page)
-      configure(options as any)
-      const element = await queries.getByTestId(document, 'testid-label')
-      expect(await queries.getNodeText(element)).toEqual('Label A')
-    },
-  )
+      const element = await queries.getByTestId(document, 'second-level-header')
+      expect(await queries.getNodeText(element)).toEqual('Hello h2')
+    })
 
+    it('should support subsequent changing the data-testid attribute names', async () => {
+      configure({testIdAttribute: 'data-id'})
+      configure({testIdAttribute: 'data-new-id'})
+      const document = await getDocument(page)
+      const element = await queries.getByTestId(document, 'first-level-header')
+      expect(await queries.getNodeText(element)).toEqual('Hello h1')
+    })
+
+    it.each([{}, undefined, null, {testIdAttribute: ''}])(
+      'should keep the default data-testid when input passed is invalid (%s)',
+      async options => {
+        const document = await getDocument(page)
+        configure(options as any)
+        const element = await queries.getByTestId(document, 'testid-label')
+        expect(await queries.getNodeText(element)).toEqual('Label A')
+      },
+    )
+  })
   it('should support regex on raw queries object', async () => {
     const scope = await page.$('#scoped')
     if (!scope) throw new Error('Should have scope')
@@ -73,10 +145,6 @@ describe('lib/index.ts', () => {
       await waitFor(async () => expect(await getByText('Loaded!')).toBeTruthy(), {timeout: 7000})
       expect(await getByText('Loaded!')).toBeTruthy()
     }, 9000)
-  })
-
-  afterEach(() => {
-    configure({testIdAttribute: 'data-testid'}) // cleanup
   })
 
   afterAll(async () => {
