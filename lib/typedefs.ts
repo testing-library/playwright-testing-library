@@ -171,7 +171,14 @@ export type BoundFunction<T> = T extends (
   : T extends (a1: any, text: infer P, options: infer Q) => infer R
   ? (text: P, options?: Q) => R
   : never
+
 export type BoundFunctions<T> = {[P in keyof T]: BoundFunction<T[P]>}
+export type BoundQueryMethods = BoundFunctions<QueryMethods>
+
+export interface FixtureQueries extends BoundFunctions<QueryMethods> {
+  getQueriesForElement(): ScopedQueries
+  getNodeText(el: Element): Promise<string>
+}
 
 export interface ScopedQueries extends BoundFunctions<QueryMethods> {
   getQueriesForElement(): ScopedQueries

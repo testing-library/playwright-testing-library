@@ -44,14 +44,18 @@ test.describe('lib/fixture.ts', () => {
     )
   })
 
-  test('handles page navigations', async ({queries: {getByTestId}, page}) => {
+  test('attaches `getNodeText`', async ({queries}) => {
+    const element = await queries.getByText('Hello h1')
+
+    expect(await queries.getNodeText(element)).toEqual('Hello h1')
+  })
+
+  test('handles page navigations', async ({queries: {getByText}, page}) => {
     await page.goto(`file://${path.join(__dirname, '../fixtures/page.html')}`)
 
-    const element = await getByTestId('testid-text-input')
+    const element = await getByText('Hello h1')
 
-    expect(await page.evaluate(el => el.outerHTML, element)).toMatch(
-      `<input type="text" data-testid="testid-text-input">`,
-    )
+    expect(await element.textContent()).toEqual('Hello h1')
   })
 
   test('should handle the get* method failures', async ({queries}) => {
