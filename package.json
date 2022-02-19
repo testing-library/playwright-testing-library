@@ -18,6 +18,7 @@
     "prepare:playwright-test:imports": "./playwright-test/prepare-package.js",
     "prepare:playwright-test:package": "jscodeshift -t ./playwright-test/rename-imports.ts --extensions=ts --parser=ts ./lib",
     "prepublishOnly": "npm run build",
+    "start:standalone": "hover-scripts test",
     "test": "run-s build:testing-library test:*",
     "test:fixture": "playwright test",
     "test:standalone": "hover-scripts test --no-watch",
