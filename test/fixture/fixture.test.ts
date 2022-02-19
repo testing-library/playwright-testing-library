@@ -3,7 +3,7 @@
 import * as path from 'path'
 import * as playwright from '@playwright/test'
 
-import {fixtures, TestingLibraryFixtures} from '../../lib/fixture'
+import {configure, fixtures, TestingLibraryFixtures} from '../../lib/fixture'
 import {getDocument, within} from '../../lib'
 
 const test = playwright.test.extend<TestingLibraryFixtures>(fixtures)
@@ -119,18 +119,45 @@ test.describe('lib/fixture.ts', () => {
   test('should get text content', async ({page}) => {
     const document = await getDocument(page)
     const $h3 = await document.$('#scoped h3')
+
     expect(await $h3.textContent()).toEqual('Hello h3')
   })
 
   test('should work with destructuring', async ({page}) => {
     const document = await getDocument(page)
     const scope = await document.$('#scoped')
+
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const {queryByText} = within(scope)
+
     expect(await queryByText('Hello h1')).toBeFalsy()
     expect(await queryByText('Hello h3')).toBeTruthy()
   })
 
+  test.describe('configuration', () => {
+    test.afterEach(() => {
+      configure({testIdAttribute: 'data-testid'}) // cleanup
+    })
+
+    test('should support custom data-testid attribute name', async ({queries}) => {
+      configure({testIdAttribute: 'data-id'})
+
+      const element = await queries.getByTestId('second-level-header')
+
+      expect(await queries.getNodeText(element)).toEqual('Hello h2')
+    })
+
+    test('should support subsequent changing the data-testid attribute names', async ({
+      queries,
+    }) => {
+      configure({testIdAttribute: 'data-id'})
+      configure({testIdAttribute: 'data-new-id'})
+
+      const element = await queries.getByTestId('first-level-header')
+
+      expect(await queries.getNodeText(element)).toEqual('Hello h1')
+    })
+  })
   test.describe('deferred page', () => {
     test.beforeEach(async ({page}) => {
       await page.goto(`file://${path.join(__dirname, '../fixtures/late-page.html')}`)
