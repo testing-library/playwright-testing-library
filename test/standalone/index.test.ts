@@ -96,6 +96,25 @@ describe('lib/index.ts', () => {
     expect(hiddenElements).toHaveLength(2)
   })
 
+  describe('querying by role with `level` option', () => {
+    test('retrieves the correct elements when querying all by role', async () => {
+      const document = await getDocument(page)
+      const elements = await queries.queryAllByRole(document, 'heading')
+      const levelOneElements = await queries.queryAllByRole(document, 'heading', {level: 3})
+
+      expect(elements).toHaveLength(3)
+      expect(levelOneElements).toHaveLength(1)
+    })
+
+    test('does not throw when querying for a specific element', async () => {
+      expect.assertions(1)
+
+      const document = await getDocument(page)
+
+      await expect(queries.getByRole(document, 'heading', {level: 3})).resolves.not.toThrow()
+    })
+  })
+
   it('attaches `getNodeText`', async () => {
     const document = await getDocument(page)
     const element = await queries.getByText(document, 'Hello h1')
