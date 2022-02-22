@@ -78,6 +78,15 @@ describe('lib/index.ts', () => {
     expect(text).toEqual('Hello h2')
   })
 
+  test('should handle the getBy* methods with a regex name', async () => {
+    const document = await getDocument(page)
+    const element = await queries.getByRole(document, 'button', {name: /getBy.*Test/})
+
+    const text = await page.evaluate(el => el.textContent, element)
+
+    expect(text).toEqual('getByRole Test')
+  })
+
   it('attaches `getNodeText`', async () => {
     const document = await getDocument(page)
     const element = await queries.getByText(document, 'Hello h1')
