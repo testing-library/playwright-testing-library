@@ -1,7 +1,8 @@
 import {
   Matcher,
-  MatcherOptions as MatcherOptions_,
-  SelectorMatcherOptions as SelectorMatcherOptions_,
+  MatcherOptions as TestingLibraryMatcherOptions,
+  SelectorMatcherOptions as TestingLibrarySelectorMatcherOptions,
+  ByRoleOptions as TestingLibraryByRoleOptions,
   waitForOptions,
 } from '@testing-library/dom'
 import {ElementHandle as PlaywrightElementHandle} from 'playwright'
@@ -10,16 +11,14 @@ export type ElementHandle = PlaywrightElementHandle<SVGElement | HTMLElement>
 
 type Element = ElementHandle
 
-type MatcherOptions = Omit<MatcherOptions_, 'normalizer'>
-type SelectorMatcherOptions = Omit<SelectorMatcherOptions_, 'normalizer'>
+type MatcherOptions = Omit<TestingLibraryMatcherOptions, 'normalizer'>
+type SelectorMatcherOptions = Omit<TestingLibrarySelectorMatcherOptions, 'normalizer'>
 
-interface RoleMatcherOptions extends MatcherOptions {
+interface RoleMatcherOptions extends Omit<TestingLibraryByRoleOptions, 'name'> {
   name?: string | RegExp
 }
 
-interface SelectorRoleMatcherOptions extends SelectorMatcherOptions {
-  name?: string | RegExp
-}
+interface SelectorRoleMatcherOptions extends SelectorMatcherOptions, RoleMatcherOptions {}
 
 interface QueryMethods {
   queryByPlaceholderText(el: Element, m: Matcher, opts?: MatcherOptions): Promise<Element | null>
