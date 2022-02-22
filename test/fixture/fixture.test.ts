@@ -124,6 +124,24 @@ test.describe('lib/fixture.ts', () => {
     expect(hiddenElements).toHaveLength(2)
   })
 
+  test.describe('querying by role with `level` option', () => {
+    test('retrieves the correct elements when querying all by role', async ({
+      queries: {queryAllByRole},
+    }) => {
+      const elements = await queryAllByRole('heading')
+      const levelOneElements = await queryAllByRole('heading', {level: 3})
+
+      expect(elements).toHaveLength(3)
+      expect(levelOneElements).toHaveLength(1)
+    })
+
+    test('does not throw when querying for a specific element', async ({queries: {getByRole}}) => {
+      expect.assertions(1)
+
+      await expect(getByRole('heading', {level: 3})).resolves.not.toThrow()
+    })
+  })
+
   test('should get text content', async ({page}) => {
     const document = await getDocument(page)
     const $h3 = await document.$('#scoped h3')
