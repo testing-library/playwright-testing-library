@@ -116,6 +116,14 @@ test.describe('lib/fixture.ts', () => {
     expect(text).toEqual('getByRole Test')
   })
 
+  test('supports `hidden` option when querying by role', async ({queries: {queryAllByRole}}) => {
+    const elements = await queryAllByRole('img')
+    const hiddenElements = await queryAllByRole('img', {hidden: true})
+
+    expect(elements).toHaveLength(1)
+    expect(hiddenElements).toHaveLength(2)
+  })
+
   test('should get text content', async ({page}) => {
     const document = await getDocument(page)
     const $h3 = await document.$('#scoped h3')

@@ -87,6 +87,15 @@ describe('lib/index.ts', () => {
     expect(text).toEqual('getByRole Test')
   })
 
+  test('supports `hidden` option when querying by role', async () => {
+    const document = await getDocument(page)
+    const elements = await queries.queryAllByRole(document, 'img')
+    const hiddenElements = await queries.queryAllByRole(document, 'img', {hidden: true})
+
+    expect(elements).toHaveLength(1)
+    expect(hiddenElements).toHaveLength(2)
+  })
+
   it('attaches `getNodeText`', async () => {
     const document = await getDocument(page)
     const element = await queries.getByText(document, 'Hello h1')
