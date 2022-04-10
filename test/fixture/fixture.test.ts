@@ -1,5 +1,3 @@
-/* eslint-disable jest/no-done-callback */
-
 import * as path from 'path'
 import * as playwright from '@playwright/test'
 
