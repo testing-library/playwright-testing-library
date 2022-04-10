@@ -19,5 +19,11 @@ module.exports = {
         'import/no-extraneous-dependencies': ['error', {devDependencies: true}],
       },
     },
+    {
+      files: ['test/fixture/**/*.+(js|ts)'],
+      rules: {
+        'jest/no-done-callback': 'off',
+      },
+    },
   ],
 }
