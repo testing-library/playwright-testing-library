@@ -51,10 +51,18 @@ jobs:
         run: npm run test:types
 
       - name: Check types, run lint + tests
+        if: ${{ matrix.playwright == 'latest' }}
         run: |
           npm why playwright
           npm why @playwright/test
-          npm run validate
+          npm run test
+
+      - name: Check types, run lint + tests
+        if: ${{ matrix.playwright != 'latest' }}
+        run: |
+          npm why playwright
+          npm why @playwright/test
+          npm run test:legacy
 
       # Only release on Node 14
 
