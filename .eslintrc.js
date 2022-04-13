@@ -28,5 +28,12 @@ module.exports = {
         'jest/no-done-callback': 'off',
       },
     },
+    {
+      files: ['lib/fixture/**/*.+(js|ts)'],
+      rules: {
+        'no-empty-pattern': 'off',
+        'no-underscore-dangle': ['error', {allow: ['__testingLibraryReviver']}],
+      },
+    },
   ],
 }
