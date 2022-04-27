@@ -1,6 +1,6 @@
-import {Queries} from './typedefs'
+import {queries} from '@testing-library/dom'
 
-export const queryNames: Array<keyof Queries> = [
+export const queryNames: Array<keyof typeof queries> = [
   'queryByPlaceholderText',
   'queryAllByPlaceholderText',
   'getByPlaceholderText',
