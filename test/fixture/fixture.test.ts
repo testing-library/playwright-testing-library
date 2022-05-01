@@ -147,12 +147,9 @@ test.describe('lib/fixture.ts', () => {
     expect(await $h3.textContent()).toEqual('Hello h3')
   })
 
-  test('should work with destructuring', async ({page}) => {
-    const document = await getDocument(page)
-    const scope = await document.$('#scoped')
-
+  test('scoping queries with `within`', async ({queries: {getByTestId}}) => {
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    const {queryByText} = within(scope)
+    const {queryByText} = within(await getByTestId('scoped'))
 
     expect(await queryByText('Hello h1')).toBeFalsy()
     expect(await queryByText('Hello h3')).toBeTruthy()
