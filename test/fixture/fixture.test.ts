@@ -2,7 +2,7 @@ import * as path from 'path'
 import * as playwright from '@playwright/test'
 
 import {configure, fixtures, TestingLibraryFixtures} from '../../lib/fixture'
-import {getDocument, within} from '../../lib'
+import {getDocument, within, getQueriesForElement} from '../../lib'
 
 const test = playwright.test.extend<TestingLibraryFixtures>(fixtures)
 
@@ -150,6 +150,14 @@ test.describe('lib/fixture.ts', () => {
   test('scoping queries with `within`', async ({queries: {getByTestId}}) => {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     const {queryByText} = within(await getByTestId('scoped'))
+
+    expect(await queryByText('Hello h1')).toBeFalsy()
+    expect(await queryByText('Hello h3')).toBeTruthy()
+  })
+
+  test('scoping queries with `getQueriesForElement`', async ({queries: {getByTestId}}) => {
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const {queryByText} = getQueriesForElement(await getByTestId('scoped'))
 
     expect(await queryByText('Hello h1')).toBeFalsy()
     expect(await queryByText('Hello h3')).toBeTruthy()
