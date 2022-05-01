@@ -58,7 +58,7 @@ yarn add --dev @playwright-testing-library/test
 
 ```ts
 import {test as baseTest} from '@playwright/test'
-import {fixtures, TestingLibraryFixtures} from '@playwright-testing-library/test/fixture'
+import {fixtures, within, TestingLibraryFixtures} from '@playwright-testing-library/test/fixture'
 
 // As only fixture
 const test = baseTest.extend<TestingLibraryFixtures>(fixtures)
@@ -79,8 +79,8 @@ const {expect} = test
 test('my form', async ({queries: {getByTestId}}) => {
   const $form = await getByTestId('my-form')
 
-  // Scope queries with `getQueriesForElement`
-  const {getByLabelText} = $form.getQueriesForElement()
+  // Scope queries with `within`
+  const {getByLabelText} = within($form)
 
   const $email = await getByLabelText('Email')
 
