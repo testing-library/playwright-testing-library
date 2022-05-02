@@ -1,10 +1,11 @@
 import {readFileSync} from 'fs'
 import * as path from 'path'
+
 import {JSHandle, Page} from 'playwright'
 import waitForExpect from 'wait-for-expect'
 
-import {ElementHandle, ConfigurationOptions, Queries, ScopedQueries} from './typedefs'
 import {queryNames} from './common'
+import {ConfigurationOptions, ElementHandle, Queries, ScopedQueries} from './typedefs'
 
 const domLibraryAsString = readFileSync(
   path.join(__dirname, '../dom-testing-library.js'),

@@ -1,8 +1,9 @@
 import * as path from 'path'
+
 import * as playwright from '@playwright/test'
 
-import {configure, fixtures, TestingLibraryFixtures} from '../../lib/fixture'
-import {getDocument, within, getQueriesForElement} from '../../lib'
+import {getDocument, getQueriesForElement, within} from '../../lib'
+import {TestingLibraryFixtures, configure, fixtures} from '../../lib/fixture'
 
 const test = playwright.test.extend<TestingLibraryFixtures>(fixtures)
 
