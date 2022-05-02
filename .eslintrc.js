@@ -1,5 +1,8 @@
 module.exports = {
-  extends: require.resolve('@hover/javascript/eslint'),
+  extends: [
+    require.resolve('@hover/javascript/eslint'),
+    require.resolve('@hover/javascript/eslint/strict'),
+  ],
   ignorePatterns: ['dom-testing-library.js', 'rollup.input.js'],
   parserOptions: {
     tsconfigRootDir: __dirname,
