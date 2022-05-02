@@ -1,6 +1,7 @@
 import {
   Matcher,
   ByRoleOptions as TestingLibraryByRoleOptions,
+  Config as TestingLibraryConfig,
   MatcherOptions as TestingLibraryMatcherOptions,
   SelectorMatcherOptions as TestingLibrarySelectorMatcherOptions,
   waitForOptions,
@@ -189,6 +190,4 @@ export interface Queries extends QueryMethods {
   getNodeText(el: Element): Promise<string>
 }
 
-export interface ConfigurationOptions {
-  testIdAttribute: string
-}
+export type ConfigurationOptions = Pick<TestingLibraryConfig, 'testIdAttribute'>
