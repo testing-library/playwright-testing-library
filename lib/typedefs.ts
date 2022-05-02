@@ -1,8 +1,8 @@
 import {
   Matcher,
+  ByRoleOptions as TestingLibraryByRoleOptions,
   MatcherOptions as TestingLibraryMatcherOptions,
   SelectorMatcherOptions as TestingLibrarySelectorMatcherOptions,
-  ByRoleOptions as TestingLibraryByRoleOptions,
   waitForOptions,
 } from '@testing-library/dom'
 import {ElementHandle as PlaywrightElementHandle} from 'playwright'
