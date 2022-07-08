@@ -145,6 +145,31 @@ test.describe('lib/fixture.ts (locators)', () => {
     expect(await innerLocator.count()).toBe(1)
   })
 
-  // TODO: configuration
   // TDOO: deferred page (do we need some alternative to `findBy*`?)
+  test.describe('deferred page', () => {
+    test.beforeEach(async ({page}) => {
+      await page.goto(`file://${path.join(__dirname, '../fixtures/late-page.html')}`)
+    })
+
+    test('should handle the queryBy* methods', async ({queries: {queryByText}}) => {
+      await expect(queryByText('Loaded!')).toBeVisible()
+    })
+
+    // eslint-disable-next-line jest/no-disabled-tests
+    test.skip('should handle the findByAll* methods', async ({
+      queries: {queryAllByText, getAllByText},
+    }) => {
+      await expect(queryAllByText(/Hello/)).toBeVisible()
+
+      const locator = getAllByText(/Hello/)
+
+      expect(locator.count()).toEqual(2)
+
+      const text = await Promise.all([locator.nth(0).textContent(), locator.nth(1).textContent()])
+
+      expect(text).toEqual(['Hello h1', 'Hello h2'])
+    })
+  })
+
+  // TODO: configuration
 })
