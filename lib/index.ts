@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+
 import {readFileSync} from 'fs'
 import * as path from 'path'
 
@@ -177,12 +179,19 @@ export function configure(options: Partial<ConfigurationOptions>): void {
     return
   }
 
-  const {testIdAttribute} = options
+  const {testIdAttribute, asyncUtilTimeout} = options
 
   if (testIdAttribute) {
     delegateFnBodyToExecuteInPage = delegateFnBodyToExecuteInPageInitial.replace(
       /testIdAttribute: (['|"])data-testid(['|"])/g,
       `testIdAttribute: $1${testIdAttribute}$2`,
+    )
+  }
+
+  if (asyncUtilTimeout) {
+    delegateFnBodyToExecuteInPage = delegateFnBodyToExecuteInPageInitial.replace(
+      /asyncUtilTimeout: \d+/g,
+      `asyncUtilTimeout: ${asyncUtilTimeout}`,
     )
   }
 }
