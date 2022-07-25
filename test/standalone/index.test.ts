@@ -124,6 +124,22 @@ describe('lib/index.ts', () => {
     expect(await queries.getNodeText(element)).toEqual('Hello h1')
   })
 
+  it('should support regex on raw queries object', async () => {
+    const scope = await page.$('#scoped')
+    if (!scope) throw new Error('Should have scope')
+    const element = await queries.getByText(scope, /Hello/i)
+    expect(await queries.getNodeText(element)).toEqual('Hello h3')
+  })
+
+  it('should bind getQueriesForElement', async () => {
+    // FIXME: I think it will take some work to get the types in a
+    // place to prevent @typescript-eslint from flagging this
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const {getByText} = getQueriesForElement(await getDocument(page))
+    const element = await getByText('Hello h1')
+    expect(await queries.getNodeText(element)).toEqual('Hello h1')
+  })
+
   describe('configuration', () => {
     afterEach(() => {
       configure({testIdAttribute: 'data-testid'}) // cleanup
@@ -148,26 +164,26 @@ describe('lib/index.ts', () => {
       'should keep the default data-testid when input passed is invalid (%s)',
       async options => {
         const document = await getDocument(page)
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         configure(options as any)
         const element = await queries.getByTestId(document, 'testid-label')
         expect(await queries.getNodeText(element)).toEqual('Label A')
       },
     )
-  })
-  it('should support regex on raw queries object', async () => {
-    const scope = await page.$('#scoped')
-    if (!scope) throw new Error('Should have scope')
-    const element = await queries.getByText(scope, /Hello/i)
-    expect(await queries.getNodeText(element)).toEqual('Hello h3')
-  })
 
-  it('should bind getQueriesForElement', async () => {
-    // FIXME: I think it will take some work to get the types in a
-    // place to prevent @typescript-eslint from flagging this
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    const {getByText} = getQueriesForElement(await getDocument(page))
-    const element = await getByText('Hello h1')
-    expect(await queries.getNodeText(element)).toEqual('Hello h1')
+    describe('async utils timeout', () => {
+      beforeEach(async () =>
+        page.goto(`file://${path.join(__dirname, '../fixtures/late-page.html')}`),
+      )
+
+      it('supports configuring timeout for findBy* queries', async () => {
+        configure({asyncUtilTimeout: 9000})
+
+        const element = await queries.findByText(await getDocument(page), 'Loaded!')
+
+        expect(element).toBeTruthy()
+      }, 9000)
+    })
   })
 
   describe('loading the deferred page', () => {
@@ -175,7 +191,15 @@ describe('lib/index.ts', () => {
       page.goto(`file://${path.join(__dirname, '../fixtures/late-page.html')}`),
     )
 
-    it('should use `wait` properly', async () => {
+    it('waits for deferred element using findBy* queries', async () => {
+      const element = await queries.findByText(await getDocument(page), 'Loaded!', undefined, {
+        timeout: 9000,
+      })
+
+      expect(element).toBeTruthy()
+    }, 9000)
+
+    it('waits for deferred element using `waitFor`', async () => {
       // FIXME: I think it will take some work to get the types in a
       // place to prevent @typescript-eslint from flagging this
       // eslint-disable-next-line @typescript-eslint/unbound-method

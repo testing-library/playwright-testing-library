@@ -191,4 +191,5 @@ export interface Queries extends QueryMethods {
 
 export interface ConfigurationOptions {
   testIdAttribute: string
+  asyncUtilTimeout: number
 }
