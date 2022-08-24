@@ -157,9 +157,11 @@ function createDelegateFor<T = DOMReturnType>(
 export async function getDocument(_page?: Page): Promise<ElementHandle> {
   // @ts-ignore
   const page: Page = _page || this
-  const documentHandle = await page.mainFrame().evaluateHandle('document')
+  const documentHandle = await page.mainFrame().evaluateHandle<HTMLElement>('document.body')
   const document = documentHandle.asElement()
+
   if (!document) throw new Error('Could not find document')
+
   return document
 }
 
