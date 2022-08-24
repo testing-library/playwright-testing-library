@@ -24,8 +24,6 @@
 
 ## ✨ Features
 
-> ⚠️ Note: this is a fork of [pptr-testing-library](https://github.com/testing-library/pptr-testing-library) modified to accomodate for some subtle API differences.
-
 All of your favorite user-centric querying functions from **@testing-library/react** and **@testing-library/dom** available from Playwright!
 
 - Playwright Test [fixture](https://playwright.dev/docs/test-fixtures) — **`@playwright-testing-library/test/fixture`** or...
