@@ -176,6 +176,8 @@ describe('lib/index.ts', () => {
         page.goto(`file://${path.join(__dirname, '../fixtures/late-page.html')}`),
       )
 
+      afterEach(async () => page.goto(`file://${path.join(__dirname, '../fixtures/page.html')}`))
+
       it('supports configuring timeout for findBy* queries', async () => {
         configure({asyncUtilTimeout: 9000})
 
@@ -186,31 +188,40 @@ describe('lib/index.ts', () => {
     })
   })
 
-  describe('loading the deferred page', () => {
-    beforeEach(async () =>
-      page.goto(`file://${path.join(__dirname, '../fixtures/late-page.html')}`),
-    )
-
-    it('waits for deferred element using findBy* queries', async () => {
-      const element = await queries.findByText(await getDocument(page), 'Loaded!', undefined, {
-        timeout: 9000,
-      })
-
-      expect(element).toBeTruthy()
-    }, 9000)
-
-    it('waits for deferred element using `waitFor`', async () => {
-      // FIXME: I think it will take some work to get the types in a
-      // place to prevent @typescript-eslint from flagging this
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      const {getByText} = getQueriesForElement(await getDocument(page))
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      await waitFor(async () => expect(await getByText('Loaded!')).toBeTruthy(), {timeout: 7000})
-      expect(await getByText('Loaded!')).toBeTruthy()
-    }, 9000)
-  })
-
   afterAll(async () => {
     await browser.close()
   })
+})
+
+describe('loading the deferred page', () => {
+  let browser: playwright.Browser
+  let page: playwright.Page
+
+  beforeEach(async () => {
+    browser = await playwright.firefox.launch()
+    page = await browser.newPage()
+    return page.goto(`file://${path.join(__dirname, '../fixtures/late-page.html')}`)
+  })
+
+  afterEach(async () => {
+    await browser.close()
+  })
+
+  it('waits for deferred element using findBy* queries', async () => {
+    const element = await queries.findByText(await getDocument(page), 'Loaded!', undefined, {
+      timeout: 9000,
+    })
+
+    expect(element).toBeTruthy()
+  }, 9000)
+
+  it('waits for deferred element using `waitFor`', async () => {
+    // FIXME: I think it will take some work to get the types in a
+    // place to prevent @typescript-eslint from flagging this
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    const {getByText} = getQueriesForElement(await getDocument(page))
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    await waitFor(async () => expect(await getByText('Loaded!')).toBeTruthy(), {timeout: 7000})
+    expect(await getByText('Loaded!')).toBeTruthy()
+  }, 9000)
 })
