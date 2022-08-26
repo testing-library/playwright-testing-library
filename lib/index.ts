@@ -6,8 +6,8 @@ import * as path from 'path'
 import {JSHandle, Page} from 'playwright'
 import waitForExpect from 'wait-for-expect'
 
-import {queryNames} from './common'
-import {ConfigurationOptions, ElementHandle, Queries, ScopedQueries} from './typedefs'
+import {Config, configureTestingLibraryScript, queryNames} from './common'
+import {ElementHandle, Queries, ScopedQueries} from './typedefs'
 
 const domLibraryAsString = readFileSync(
   path.join(__dirname, '../dom-testing-library.js'),
@@ -176,26 +176,15 @@ export function wait(
 
 export const waitFor = wait
 
-export function configure(options: Partial<ConfigurationOptions>): void {
-  if (!options) {
+export function configure(config: Partial<Config>): void {
+  if (!config) {
     return
   }
 
-  const {testIdAttribute, asyncUtilTimeout} = options
-
-  if (testIdAttribute) {
-    delegateFnBodyToExecuteInPage = delegateFnBodyToExecuteInPageInitial.replace(
-      /testIdAttribute: (['|"])data-testid(['|"])/g,
-      `testIdAttribute: $1${testIdAttribute}$2`,
-    )
-  }
-
-  if (asyncUtilTimeout) {
-    delegateFnBodyToExecuteInPage = delegateFnBodyToExecuteInPageInitial.replace(
-      /asyncUtilTimeout: \d+/g,
-      `asyncUtilTimeout: ${asyncUtilTimeout}`,
-    )
-  }
+  delegateFnBodyToExecuteInPage = configureTestingLibraryScript(
+    delegateFnBodyToExecuteInPageInitial,
+    config,
+  )
 }
 
 export function getQueriesForElement<T>(
