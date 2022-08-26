@@ -1,4 +1,22 @@
-import {queries} from '@testing-library/dom'
+import {Config as TestingLibraryConfig, queries} from '@testing-library/dom'
+
+export type Config = Pick<TestingLibraryConfig, 'testIdAttribute' | 'asyncUtilTimeout'>
+
+export const configureTestingLibraryScript = (
+  script: string,
+  {testIdAttribute, asyncUtilTimeout}: Partial<Config>,
+) => {
+  const withTestId = testIdAttribute
+    ? script.replace(
+        /testIdAttribute: (['|"])data-testid(['|"])/g,
+        `testIdAttribute: $1${testIdAttribute}$2`,
+      )
+    : script
+
+  return asyncUtilTimeout
+    ? withTestId.replace(/asyncUtilTimeout: \d+/g, `asyncUtilTimeout: ${asyncUtilTimeout}`)
+    : withTestId
+}
 
 export const queryNames: Array<keyof typeof queries> = [
   'queryByPlaceholderText',
