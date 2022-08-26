@@ -129,8 +129,6 @@ test.describe('lib/fixture.ts (locators)', () => {
     })
 
     test('does not throw when querying for a specific element', async ({queries: {getByRole}}) => {
-      expect.assertions(1)
-
       await expect(getByRole('heading', {level: 3}).textContent()).resolves.not.toThrow()
     })
   })
@@ -147,6 +145,27 @@ test.describe('lib/fixture.ts (locators)', () => {
     expect(await innerLocator.count()).toBe(1)
   })
 
-  // TODO: configuration
+  test.describe('configuration', () => {
+    test.describe('custom data-testeid', () => {
+      test.use({testIdAttribute: 'data-id'})
+
+      test('supports custom data-testid attribute name', async ({queries}) => {
+        const locator = queries.getByTestId('second-level-header')
+
+        expect(await locator.textContent()).toEqual('Hello h2')
+      })
+    })
+
+    test.describe('nested configuration', () => {
+      test.use({testIdAttribute: 'data-new-id'})
+
+      test('supports nested data-testid attribute names', async ({queries}) => {
+        const locator = queries.getByTestId('first-level-header')
+
+        expect(await locator.textContent()).toEqual('Hello h1')
+      })
+    })
+  })
+
   // TDOO: deferred page (do we need some alternative to `findBy*`?)
 })

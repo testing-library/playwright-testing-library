@@ -1,7 +1,6 @@
 import {
   Matcher,
   ByRoleOptions as TestingLibraryByRoleOptions,
-  Config as TestingLibraryConfig,
   MatcherOptions as TestingLibraryMatcherOptions,
   SelectorMatcherOptions as TestingLibrarySelectorMatcherOptions,
   waitForOptions,
@@ -189,8 +188,3 @@ export interface Queries extends QueryMethods {
   getQueriesForElement(): ScopedQueries
   getNodeText(el: Element): Promise<string>
 }
-
-export type ConfigurationOptions = Pick<
-  TestingLibraryConfig,
-  'testIdAttribute' | 'asyncUtilTimeout'
->
