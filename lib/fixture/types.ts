@@ -2,6 +2,8 @@ import {Locator} from '@playwright/test'
 import type * as TestingLibraryDom from '@testing-library/dom'
 import {queries} from '@testing-library/dom'
 
+import {Config} from '../common'
+
 import {reviver} from './helpers'
 
 /**
@@ -37,6 +39,7 @@ type KebabCase<S> = S extends `${infer C}${infer T}`
   : S
 
 export type LocatorQueries = StripNever<{[K in keyof Queries]: ConvertQuery<Queries[K]>}>
+export type Within = (locator: Locator) => LocatorQueries
 
 export type Query = keyof Queries
 
@@ -45,6 +48,15 @@ export type FindQuery = Extract<Query, `find${string}`>
 export type SupportedQuery = Exclude<Query, FindQuery>
 
 export type Selector = KebabCase<SupportedQuery>
+
+export type {Config}
+export interface ConfigFn {
+  (existingConfig: Config): Partial<Config>
+}
+
+export type ConfigDelta = ConfigFn | Partial<Config>
+export type Configure = (configDelta: ConfigDelta) => void
+export type ConfigureLocator = (configDelta: ConfigDelta) => Config
 
 declare global {
   interface Window {
