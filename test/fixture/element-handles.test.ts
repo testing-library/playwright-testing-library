@@ -135,8 +135,6 @@ test.describe('lib/fixture.ts', () => {
     })
 
     test('does not throw when querying for a specific element', async ({queries: {getByRole}}) => {
-      expect.assertions(1)
-
       await expect(getByRole('heading', {level: 3})).resolves.not.toThrow()
     })
   })
