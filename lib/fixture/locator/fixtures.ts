@@ -1,43 +1,28 @@
-import type {Locator, Page, PlaywrightTestArgs, TestFixture} from '@playwright/test'
+import type {Locator, PlaywrightTestArgs, TestFixture} from '@playwright/test'
 import {selectors} from '@playwright/test'
-import {queries} from '@testing-library/dom'
 
-import {replacer} from '../helpers'
-import type {
-  Config,
-  LocatorQueries as Queries,
-  Query,
-  SelectorEngine,
-  SupportedQuery,
-} from '../types'
+import type {Config, LocatorQueries as Queries, SelectorEngine, SynchronousQuery} from '../types'
 
-import {buildTestingLibraryScript, isAllQuery, isNotFindQuery, queryToSelector} from './helpers'
+import {
+  buildTestingLibraryScript,
+  isAllQuery,
+  queriesFor,
+  queryToSelector,
+  synchronousQueryNames,
+} from './helpers'
 
-const allQueryNames = Object.keys(queries) as Query[]
-
-const queryNames = allQueryNames.filter(isNotFindQuery)
 const defaultConfig: Config = {testIdAttribute: 'data-testid', asyncUtilTimeout: 1000}
 
 const options = Object.fromEntries(
   Object.entries(defaultConfig).map(([key, value]) => [key, [value, {option: true}] as const]),
 )
 
-const queriesFor = (pageOrLocator: Page | Locator) =>
-  queryNames.reduce(
-    (rest, query) => ({
-      ...rest,
-      [query]: (...args: Parameters<Queries[keyof Queries]>) =>
-        pageOrLocator.locator(`${queryToSelector(query)}=${JSON.stringify(args, replacer)}`),
-    }),
-    {} as Queries,
-  )
-
 const queriesFixture: TestFixture<Queries, PlaywrightTestArgs> = async ({page}, use) =>
   use(queriesFor(page))
 
 const within = (locator: Locator): Queries => queriesFor(locator)
 
-declare const queryName: SupportedQuery
+declare const queryName: SynchronousQuery
 
 const engine: () => SelectorEngine = () => ({
   query(root, selector) {
@@ -77,7 +62,7 @@ const registerSelectorsFixture: [
   async ({}, use) => {
     try {
       await Promise.all(
-        queryNames.map(async name =>
+        synchronousQueryNames.map(async name =>
           selectors.register(
             queryToSelector(name),
             `(${engine.toString().replace(/queryName/g, `"${name}"`)})()`,
