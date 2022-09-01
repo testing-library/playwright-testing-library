@@ -1,11 +1,19 @@
 import type {Locator, Page, PlaywrightTestArgs, TestFixture} from '@playwright/test'
 import {selectors} from '@playwright/test'
+import {queries} from '@testing-library/dom'
 
-import {queryNames as allQueryNames} from '../../common'
 import {replacer} from '../helpers'
-import type {Config, LocatorQueries as Queries, SelectorEngine, SupportedQuery} from '../types'
+import type {
+  Config,
+  LocatorQueries as Queries,
+  Query,
+  SelectorEngine,
+  SupportedQuery,
+} from '../types'
 
 import {buildTestingLibraryScript, isAllQuery, isNotFindQuery, queryToSelector} from './helpers'
+
+const allQueryNames = Object.keys(queries) as Query[]
 
 const queryNames = allQueryNames.filter(isNotFindQuery)
 const defaultConfig: Config = {testIdAttribute: 'data-testid', asyncUtilTimeout: 1000}
