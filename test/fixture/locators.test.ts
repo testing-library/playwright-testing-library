@@ -13,156 +13,162 @@ const test = playwright.test.extend<TestingLibraryFixtures>(fixtures)
 const {expect} = test
 
 test.describe('lib/fixture.ts (locators)', () => {
-  test.beforeEach(async ({page}) => {
-    await page.goto(`file://${path.join(__dirname, '../fixtures/page.html')}`)
-  })
+  test.describe('standard page', () => {
+    test.beforeEach(async ({page}) => {
+      await page.goto(`file://${path.join(__dirname, '../fixtures/page.html')}`)
+    })
 
-  test('should handle the query* methods', async ({queries: {queryByText}}) => {
-    const locator = queryByText('Hello h1')
+    test.afterEach(async ({page}) => page.close())
 
-    expect(locator).toBeTruthy()
-    expect(await locator.textContent()).toEqual('Hello h1')
-  })
+    test('should handle the query* methods', async ({queries: {queryByText}}) => {
+      const locator = queryByText('Hello h1')
 
-  test('should use the new v3 methods', async ({queries: {queryByRole}}) => {
-    const locator = queryByRole('presentation')
+      expect(locator).toBeTruthy()
+      expect(await locator.textContent()).toEqual('Hello h1')
+    })
 
-    expect(locator).toBeTruthy()
-    expect(await locator.textContent()).toContain('Layout table')
-  })
+    test('should use the new v3 methods', async ({queries: {queryByRole}}) => {
+      const locator = queryByRole('presentation')
 
-  test('should handle regex matching', async ({queries: {queryByText}}) => {
-    const locator = queryByText(/HeLlO h(1|7)/i)
+      expect(locator).toBeTruthy()
+      expect(await locator.textContent()).toContain('Layout table')
+    })
 
-    expect(locator).toBeTruthy()
-    expect(await locator.textContent()).toEqual('Hello h1')
-  })
+    test('should handle regex matching', async ({queries: {queryByText}}) => {
+      const locator = queryByText(/HeLlO h(1|7)/i)
 
-  test('should handle the get* methods', async ({queries: {getByTestId}}) => {
-    const locator = getByTestId('testid-text-input')
+      expect(locator).toBeTruthy()
+      expect(await locator.textContent()).toEqual('Hello h1')
+    })
 
-    expect(await locator.evaluate(el => el.outerHTML)).toMatch(
-      `<input type="text" data-testid="testid-text-input">`,
-    )
-  })
+    test('should handle the get* methods', async ({queries: {getByTestId}}) => {
+      const locator = getByTestId('testid-text-input')
 
-  test('handles page navigations', async ({queries: {getByText}, page}) => {
-    await page.goto(`file://${path.join(__dirname, '../fixtures/page.html')}`)
+      expect(await locator.evaluate(el => el.outerHTML)).toMatch(
+        `<input type="text" data-testid="testid-text-input">`,
+      )
+    })
 
-    const locator = getByText('Hello h1')
+    test('handles page navigations', async ({queries: {getByText}, page}) => {
+      await page.goto(`file://${path.join(__dirname, '../fixtures/page.html')}`)
 
-    expect(await locator.textContent()).toEqual('Hello h1')
-  })
+      const locator = getByText('Hello h1')
 
-  test('should handle the get* method failures', async ({queries}) => {
-    const {getByTitle} = queries
-    // Use the scoped element so the pretty HTML snapshot is smaller
+      expect(await locator.textContent()).toEqual('Hello h1')
+    })
 
-    await expect(async () => getByTitle('missing').textContent()).rejects.toThrow()
-  })
+    test('should handle the get* method failures', async ({queries}) => {
+      const {getByTitle} = queries
+      // Use the scoped element so the pretty HTML snapshot is smaller
 
-  test('should handle the LabelText methods', async ({queries}) => {
-    const {getByLabelText} = queries
-    const locator = getByLabelText('Label A')
+      await expect(async () => getByTitle('missing').textContent()).rejects.toThrow()
+    })
 
-    /* istanbul ignore next */
-    expect(await locator.evaluate(el => el.outerHTML)).toMatch(
-      `<input id="label-text-input" type="text">`,
-    )
-  })
+    test('should handle the LabelText methods', async ({queries}) => {
+      const {getByLabelText} = queries
+      const locator = getByLabelText('Label A')
 
-  test('should handle the queryAll* methods', async ({queries}) => {
-    const {queryAllByText} = queries
-    const locator = queryAllByText(/Hello/)
+      /* istanbul ignore next */
+      expect(await locator.evaluate(el => el.outerHTML)).toMatch(
+        `<input id="label-text-input" type="text">`,
+      )
+    })
 
-    expect(await locator.count()).toEqual(3)
-
-    const text = await Promise.all([
-      locator.nth(0).textContent(),
-      locator.nth(1).textContent(),
-      locator.nth(2).textContent(),
-    ])
-
-    expect(text).toEqual(['Hello h1', 'Hello h2', 'Hello h3'])
-  })
-
-  test('should handle the queryAll* methods with a selector', async ({queries}) => {
-    const {queryAllByText} = queries
-    const locator = queryAllByText(/Hello/, {selector: 'h2'})
-
-    expect(await locator.count()).toEqual(1)
-
-    expect(await locator.textContent()).toEqual('Hello h2')
-  })
-
-  test('should handle the getBy* methods with a selector', async ({queries}) => {
-    const {getByText} = queries
-    const locator = getByText(/Hello/, {selector: 'h2'})
-
-    expect(await locator.textContent()).toEqual('Hello h2')
-  })
-
-  test('should handle the getBy* methods with a regex name', async ({queries}) => {
-    const {getByRole} = queries
-    const element = getByRole('button', {name: /getBy.*Test/})
-
-    expect(await element.textContent()).toEqual('getByRole Test')
-  })
-
-  test('supports `hidden` option when querying by role', async ({queries: {queryAllByRole}}) => {
-    const elements = queryAllByRole('img')
-    const hiddenElements = queryAllByRole('img', {hidden: true})
-
-    expect(await elements.count()).toEqual(1)
-    expect(await hiddenElements.count()).toEqual(2)
-  })
-
-  test.describe('querying by role with `level` option', () => {
-    test('retrieves the correct elements when querying all by role', async ({
-      queries: {queryAllByRole},
-    }) => {
-      const locator = queryAllByRole('heading')
-      const levelOneLocator = queryAllByRole('heading', {level: 3})
+    test('should handle the queryAll* methods', async ({queries}) => {
+      const {queryAllByText} = queries
+      const locator = queryAllByText(/Hello/)
 
       expect(await locator.count()).toEqual(3)
-      expect(await levelOneLocator.count()).toEqual(1)
+
+      const text = await Promise.all([
+        locator.nth(0).textContent(),
+        locator.nth(1).textContent(),
+        locator.nth(2).textContent(),
+      ])
+
+      expect(text).toEqual(['Hello h1', 'Hello h2', 'Hello h3'])
     })
 
-    test('does not throw when querying for a specific element', async ({queries: {getByRole}}) => {
-      await expect(getByRole('heading', {level: 3}).textContent()).resolves.not.toThrow()
+    test('should handle the queryAll* methods with a selector', async ({queries}) => {
+      const {queryAllByText} = queries
+      const locator = queryAllByText(/Hello/, {selector: 'h2'})
+
+      expect(await locator.count()).toEqual(1)
+
+      expect(await locator.textContent()).toEqual('Hello h2')
     })
-  })
 
-  test('scopes to container with `within`', async ({queries: {queryByRole}}) => {
-    const form = queryByRole('form', {name: 'User'})
+    test('should handle the getBy* methods with a selector', async ({queries}) => {
+      const {getByText} = queries
+      const locator = getByText(/Hello/, {selector: 'h2'})
 
-    const {queryByLabelText} = within(form)
+      expect(await locator.textContent()).toEqual('Hello h2')
+    })
 
-    const outerLocator = queryByLabelText('Name')
-    const innerLocator = queryByLabelText('Username')
+    test('should handle the getBy* methods with a regex name', async ({queries}) => {
+      const {getByRole} = queries
+      const element = getByRole('button', {name: /getBy.*Test/})
 
-    expect(await outerLocator.count()).toBe(0)
-    expect(await innerLocator.count()).toBe(1)
-  })
+      expect(await element.textContent()).toEqual('getByRole Test')
+    })
 
-  test.describe('configuration', () => {
-    test.describe('custom data-testeid', () => {
-      test.use({testIdAttribute: 'data-id'})
+    test('supports `hidden` option when querying by role', async ({queries: {queryAllByRole}}) => {
+      const elements = queryAllByRole('img')
+      const hiddenElements = queryAllByRole('img', {hidden: true})
 
-      test('supports custom data-testid attribute name', async ({queries}) => {
-        const locator = queries.getByTestId('second-level-header')
+      expect(await elements.count()).toEqual(1)
+      expect(await hiddenElements.count()).toEqual(2)
+    })
 
-        expect(await locator.textContent()).toEqual('Hello h2')
+    test.describe('querying by role with `level` option', () => {
+      test('retrieves the correct elements when querying all by role', async ({
+        queries: {queryAllByRole},
+      }) => {
+        const locator = queryAllByRole('heading')
+        const levelOneLocator = queryAllByRole('heading', {level: 3})
+
+        expect(await locator.count()).toEqual(3)
+        expect(await levelOneLocator.count()).toEqual(1)
+      })
+
+      test('does not throw when querying for a specific element', async ({
+        queries: {getByRole},
+      }) => {
+        await expect(getByRole('heading', {level: 3}).textContent()).resolves.not.toThrow()
       })
     })
 
-    test.describe('nested configuration', () => {
-      test.use({testIdAttribute: 'data-new-id'})
+    test('scopes to container with `within`', async ({queries: {queryByRole}}) => {
+      const form = queryByRole('form', {name: 'User'})
 
-      test('supports nested data-testid attribute names', async ({queries}) => {
-        const locator = queries.getByTestId('first-level-header')
+      const {queryByLabelText} = within(form)
 
-        expect(await locator.textContent()).toEqual('Hello h1')
+      const outerLocator = queryByLabelText('Name')
+      const innerLocator = queryByLabelText('Username')
+
+      expect(await outerLocator.count()).toBe(0)
+      expect(await innerLocator.count()).toBe(1)
+    })
+
+    test.describe('configuration', () => {
+      test.describe('custom data-testid', () => {
+        test.use({testIdAttribute: 'data-id'})
+
+        test('supports custom data-testid attribute name', async ({queries}) => {
+          const locator = queries.getByTestId('second-level-header')
+
+          expect(await locator.textContent()).toEqual('Hello h2')
+        })
+      })
+
+      test.describe('nested configuration', () => {
+        test.use({testIdAttribute: 'data-new-id'})
+
+        test('supports nested data-testid attribute names', async ({queries}) => {
+          const locator = queries.getByTestId('first-level-header')
+
+          expect(await locator.textContent()).toEqual('Hello h1')
+        })
       })
     })
   })
