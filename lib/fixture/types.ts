@@ -2,7 +2,7 @@ import {Locator} from '@playwright/test'
 import type * as TestingLibraryDom from '@testing-library/dom'
 import {queries} from '@testing-library/dom'
 
-import {Config} from '../common'
+import type {Config as CommonConfig} from '../common'
 
 import {reviver} from './helpers'
 
@@ -23,13 +23,25 @@ export type SelectorEngine = {
 }
 
 type Queries = typeof queries
+type WaitForState = Exclude<Parameters<Locator['waitFor']>[0], undefined>['state']
+type AsyncUtilExpectedState = Extract<WaitForState, 'visible' | 'attached'>
 
-type StripNever<T> = {[P in keyof T as T[P] extends never ? never : P]: T[P]}
 type ConvertQuery<Query extends Queries[keyof Queries]> = Query extends (
   el: HTMLElement,
   ...rest: infer Rest
 ) => HTMLElement | (HTMLElement[] | null) | (HTMLElement | null)
   ? (...args: Rest) => Locator
+  : Query extends (
+      el: HTMLElement,
+      id: infer Id,
+      options: infer Options,
+      waitForOptions: infer WaitForOptions,
+    ) => Promise<any>
+  ? (
+      id: Id,
+      options?: Options,
+      waitForOptions?: WaitForOptions & {state?: AsyncUtilExpectedState},
+    ) => Promise<Locator>
   : never
 
 type KebabCase<S> = S extends `${infer C}${infer T}`
@@ -38,7 +50,7 @@ type KebabCase<S> = S extends `${infer C}${infer T}`
     : `${Uncapitalize<C>}-${KebabCase<T>}`
   : S
 
-export type LocatorQueries = StripNever<{[K in keyof Queries]: ConvertQuery<Queries[K]>}>
+export type LocatorQueries = {[K in keyof Queries]: ConvertQuery<Queries[K]>}
 export type Within = (locator: Locator) => LocatorQueries
 
 export type Query = keyof Queries
@@ -46,11 +58,14 @@ export type Query = keyof Queries
 export type AllQuery = Extract<Query, `${string}All${string}`>
 export type FindQuery = Extract<Query, `find${string}`>
 export type GetQuery = Extract<Query, `get${string}`>
+export type QueryQuery = Extract<Query, `query${string}`>
 export type SynchronousQuery = Exclude<Query, FindQuery>
 
 export type Selector = KebabCase<SynchronousQuery>
 
-export type {Config}
+export interface Config extends CommonConfig {
+  asyncUtilExpectedState: AsyncUtilExpectedState
+}
 export interface ConfigFn {
   (existingConfig: Config): Partial<Config>
 }

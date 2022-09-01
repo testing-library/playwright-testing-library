@@ -3,6 +3,6 @@ export {
   options,
   queriesFixture,
   registerSelectorsFixture,
-  within,
+  withinFixture,
 } from './fixtures'
 export type {Queries} from './fixtures'
