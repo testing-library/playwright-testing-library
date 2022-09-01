@@ -1,7 +1,13 @@
 import type {Locator, PlaywrightTestArgs, TestFixture} from '@playwright/test'
 import {selectors} from '@playwright/test'
 
-import type {Config, LocatorQueries as Queries, SelectorEngine, SynchronousQuery} from '../types'
+import type {
+  Config,
+  LocatorQueries as Queries,
+  SelectorEngine,
+  SynchronousQuery,
+  Within,
+} from '../types'
 
 import {
   buildTestingLibraryScript,
@@ -11,16 +17,30 @@ import {
   synchronousQueryNames,
 } from './helpers'
 
-const defaultConfig: Config = {testIdAttribute: 'data-testid', asyncUtilTimeout: 1000}
+type TestArguments = PlaywrightTestArgs & Config
+
+const defaultConfig: Config = {
+  asyncUtilExpectedState: 'visible',
+  asyncUtilTimeout: 1000,
+  testIdAttribute: 'data-testid',
+}
 
 const options = Object.fromEntries(
   Object.entries(defaultConfig).map(([key, value]) => [key, [value, {option: true}] as const]),
 )
 
-const queriesFixture: TestFixture<Queries, PlaywrightTestArgs> = async ({page}, use) =>
-  use(queriesFor(page))
+const queriesFixture: TestFixture<Queries, TestArguments> = async (
+  {page, asyncUtilExpectedState, asyncUtilTimeout},
+  use,
+) => use(queriesFor(page, {asyncUtilExpectedState, asyncUtilTimeout}))
 
-const within = (locator: Locator): Queries => queriesFor(locator)
+const withinFixture: TestFixture<Within, TestArguments> = async (
+  {asyncUtilExpectedState, asyncUtilTimeout},
+  use,
+) =>
+  use(
+    (locator: Locator): Queries => queriesFor(locator, {asyncUtilExpectedState, asyncUtilTimeout}),
+  )
 
 declare const queryName: SynchronousQuery
 
@@ -82,12 +102,14 @@ const registerSelectorsFixture: [
 ]
 
 const installTestingLibraryFixture: [
-  TestFixture<void, PlaywrightTestArgs & Config>,
+  TestFixture<void, TestArguments>,
   {scope: 'test'; auto?: boolean},
 ] = [
-  async ({context, asyncUtilTimeout, testIdAttribute}, use) => {
+  async ({context, asyncUtilExpectedState, asyncUtilTimeout, testIdAttribute}, use) => {
     await context.addInitScript(
-      await buildTestingLibraryScript({config: {asyncUtilTimeout, testIdAttribute}}),
+      await buildTestingLibraryScript({
+        config: {asyncUtilExpectedState, asyncUtilTimeout, testIdAttribute},
+      }),
     )
 
     await use()
@@ -95,5 +117,11 @@ const installTestingLibraryFixture: [
   {scope: 'test', auto: true},
 ]
 
-export {installTestingLibraryFixture, options, queriesFixture, registerSelectorsFixture, within}
+export {
+  installTestingLibraryFixture,
+  options,
+  queriesFixture,
+  registerSelectorsFixture,
+  withinFixture,
+}
 export type {Queries}
