@@ -45,9 +45,10 @@ export type Query = keyof Queries
 
 export type AllQuery = Extract<Query, `${string}All${string}`>
 export type FindQuery = Extract<Query, `find${string}`>
-export type SupportedQuery = Exclude<Query, FindQuery>
+export type GetQuery = Extract<Query, `get${string}`>
+export type SynchronousQuery = Exclude<Query, FindQuery>
 
-export type Selector = KebabCase<SupportedQuery>
+export type Selector = KebabCase<SynchronousQuery>
 
 export type {Config}
 export interface ConfigFn {

@@ -1,14 +1,27 @@
 import {promises as fs} from 'fs'
 
+import type {Locator, Page} from '@playwright/test'
+import {queries} from '@testing-library/dom'
+
 import {configureTestingLibraryScript} from '../../common'
-import {reviver} from '../helpers'
-import type {AllQuery, Config, FindQuery, Query, Selector, SupportedQuery} from '../types'
+import {replacer, reviver} from '../helpers'
+import type {
+  AllQuery,
+  Config,
+  FindQuery,
+  LocatorQueries as Queries,
+  Query,
+  Selector,
+  SynchronousQuery,
+} from '../types'
+
+const allQueryNames = Object.keys(queries) as Query[]
 
 const isAllQuery = (query: Query): query is AllQuery => query.includes('All')
 const isNotFindQuery = (query: Query): query is Exclude<Query, FindQuery> =>
   !query.startsWith('find')
 
-const queryToSelector = (query: SupportedQuery) =>
+const queryToSelector = (query: SynchronousQuery) =>
   query.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase() as Selector
 
 const buildTestingLibraryScript = async ({config}: {config: Config}) => {
@@ -26,4 +39,16 @@ const buildTestingLibraryScript = async ({config}: {config: Config}) => {
   `
 }
 
-export {isAllQuery, isNotFindQuery, queryToSelector, buildTestingLibraryScript}
+const synchronousQueryNames = allQueryNames.filter(isNotFindQuery)
+
+const queriesFor = (pageOrLocator: Page | Locator) =>
+  synchronousQueryNames.reduce(
+    (rest, query) => ({
+      ...rest,
+      [query]: (...args: Parameters<Queries[keyof Queries]>) =>
+        pageOrLocator.locator(`${queryToSelector(query)}=${JSON.stringify(args, replacer)}`),
+    }),
+    {} as Queries,
+  )
+
+export {buildTestingLibraryScript, isAllQuery, queriesFor, queryToSelector, synchronousQueryNames}
