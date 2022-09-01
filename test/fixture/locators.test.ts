@@ -5,7 +5,6 @@ import * as playwright from '@playwright/test'
 import {
   LocatorFixtures as TestingLibraryFixtures,
   locatorFixtures as fixtures,
-  within,
 } from '../../lib/fixture'
 
 const test = playwright.test.extend<TestingLibraryFixtures>(fixtures)
@@ -138,7 +137,7 @@ test.describe('lib/fixture.ts (locators)', () => {
       })
     })
 
-    test('scopes to container with `within`', async ({queries: {queryByRole}}) => {
+    test('scopes to container with `within`', async ({queries: {queryByRole}, within}) => {
       const form = queryByRole('form', {name: 'User'})
 
       const {queryByLabelText} = within(form)
@@ -173,5 +172,110 @@ test.describe('lib/fixture.ts (locators)', () => {
     })
   })
 
-  // TDOO: deferred page (do we need some alternative to `findBy*`?)
+  test.describe('deferred page', () => {
+    test.beforeEach(async ({page}) => {
+      await page.goto(`file://${path.join(__dirname, '../fixtures/late-page.html')}`)
+    })
+
+    test.afterEach(async ({page}) => page.close())
+
+    test('should handle the findBy* methods', async ({queries}) => {
+      const locator = await queries.findByText('Loaded!', undefined, {timeout: 7000})
+
+      expect(await locator.textContent()).toEqual('Loaded!')
+    })
+
+    test('should handle the findAllBy* methods', async ({queries}) => {
+      const locator = await queries.findAllByText(/Hello/, undefined, {timeout: 7000})
+
+      const text = await Promise.all([locator.nth(0).textContent(), locator.nth(1).textContent()])
+
+      expect(text).toEqual(['Hello h1', 'Hello h2'])
+    })
+
+    test('throws Testing Library error when locator times out', async ({queries}) => {
+      const query = async () => queries.findByText(/Loaded!/, undefined, {timeout: 1000})
+
+      await expect(query).rejects.toThrowError(
+        expect.objectContaining({
+          message: expect.stringContaining('TestingLibraryElementError'),
+        }),
+      )
+    })
+
+    test('throws Testing Library error when multi-element locator times out', async ({queries}) => {
+      const query = async () => queries.findAllByText(/Hello/, undefined, {timeout: 1000})
+
+      await expect(query).rejects.toThrowError(
+        expect.objectContaining({
+          message: expect.stringContaining('TestingLibraryElementError'),
+        }),
+      )
+    })
+
+    test.describe('configuring asynchronous queries via `use`', () => {
+      test.use({asyncUtilTimeout: 7000})
+
+      test('reads timeout configuration from `use` configuration', async ({queries, page}) => {
+        // Ensure this test fails if we don't set `timeout` correctly in the `waitFor` in our find query
+        page.setDefaultTimeout(4000)
+
+        const locator = await queries.findByText('Loaded!')
+
+        expect(await locator.textContent()).toEqual('Loaded!')
+      })
+    })
+
+    test('waits for hidden element to be visible when `visible` is passed for state', async ({
+      queries,
+    }) => {
+      await expect(queries.getByText('Hidden')).toBeHidden()
+
+      const locator = await queries.findByText('Hidden', undefined, {
+        timeout: 7000,
+        state: 'visible',
+      })
+
+      expect(await locator.textContent()).toEqual('Hidden')
+    })
+
+    test.describe('configuring asynchronous queries with `visible` state', () => {
+      test.use({asyncUtilExpectedState: 'visible'})
+
+      test('waits for hidden element to be visible', async ({queries}) => {
+        await expect(queries.getByText('Hidden')).toBeHidden()
+
+        const locator = await queries.findByText('Hidden', undefined, {timeout: 7000})
+
+        expect(await locator.textContent()).toEqual('Hidden')
+      })
+    })
+
+    test('waits for hidden element to be attached when `attached` is passed for state', async ({
+      queries,
+    }) => {
+      await expect(queries.queryByText('Attached')).toHaveCount(0)
+
+      const locator = await queries.findByText('Attached', undefined, {
+        timeout: 7000,
+        state: 'attached',
+      })
+
+      expect(await locator.textContent()).toEqual('Attached')
+      await expect(locator).toBeHidden()
+    })
+
+    test.describe('configuring asynchronous queries with `attached` state', () => {
+      test.use({asyncUtilExpectedState: 'attached'})
+
+      test('waits for hidden element to be attached', async ({queries}) => {
+        await expect(queries.queryByText('Attached')).toHaveCount(0)
+
+        const locator = await queries.findByText('Attached', undefined, {timeout: 7000})
+
+        expect(await locator.textContent()).toEqual('Attached')
+        await expect(locator).toBeHidden()
+      })
+    })
+  })
 })
