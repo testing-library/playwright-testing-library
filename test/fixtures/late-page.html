@@ -2,6 +2,7 @@
 <html>
   <body>
     <span>Loading...</span>
+    <span id="hidden" style="visibility: hidden">Hidden</span>
     <script>
       setTimeout(() => {
         const loaded = document.createElement('span')
@@ -15,6 +16,14 @@
         const heading2 = document.createElement('h2')
         heading2.textContent = 'Hello h2'
         document.body.appendChild(heading2)
+
+        const hidden = document.getElementById('hidden')
+        hidden.style.visibility = 'visible'
+
+        const attached = document.createElement('span')
+        attached.textContent = 'Attached'
+        attached.style.visibility = 'hidden'
+        document.body.appendChild(attached)
       }, 5000)
     </script>
   </body>
