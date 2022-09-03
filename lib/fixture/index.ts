@@ -7,6 +7,7 @@ import {
   installTestingLibraryFixture,
   queriesFixture as locatorQueriesFixture,
   options,
+  queriesFor,
   registerSelectorsFixture,
   withinFixture,
 } from './locator'
@@ -35,9 +36,11 @@ interface LocatorFixtures extends Partial<Config> {
 
 export {configure} from '..'
 
-export type {ElementHandleFixtures as TestingLibraryFixtures}
-export {elementHandleQueriesFixture as fixture}
-export {elementHandleFixtures as fixtures}
-export type {LocatorFixtures}
-export {locatorQueriesFixture}
-export {locatorFixtures}
+export type {ElementHandleFixtures as TestingLibraryFixtures, LocatorFixtures}
+export {
+  locatorFixtures,
+  locatorQueriesFixture,
+  elementHandleQueriesFixture as fixture,
+  elementHandleFixtures as fixtures,
+  queriesFor,
+}
