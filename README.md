@@ -137,7 +137,7 @@ Unique methods, not part of **@testing-library/dom**
 
 ---
 
-The **[@testing-library/dom](https://github.com/testing-library/dom-testing-library#usage)** — All **`get*`** and **`query*`** methods are supported.
+The **[@testing-library/dom](https://github.com/testing-library/dom-testing-library#usage)** — All **`get*`**, **`query*`**, and **`find*`** methods are supported.
 
 - `getQueriesForElement(handle: ElementHandle): ElementHandle & QueryUtils` - extend the input object with the query API and return it
 - `getNodeText(handle: ElementHandle): Promise<string>` - get the text content of the element
