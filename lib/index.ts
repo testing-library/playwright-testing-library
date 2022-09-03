@@ -176,6 +176,19 @@ export function wait(
 
 export const waitFor = wait
 
+/**
+ * Configuration API for legacy queries that return `ElementHandle` instances.
+ * Only `testIdAttribute` and `asyncUtilTimeout` are currently supported.
+
+ * @see {@link https://testing-library.com/docs/dom-testing-library/api-configuration}
+ *
+ * ⚠️ This API has no effect on the queries that return `Locator` instances. Use
+ * `test.use` instead to configure the `Locator` queries.
+ *
+ * @see {@link https://github.com/testing-library/playwright-testing-library/releases/tag/v4.4.0-beta.2}
+ * 
+ * @param config 
+ */
 export function configure(config: Partial<Config>): void {
   if (!config) {
     return
