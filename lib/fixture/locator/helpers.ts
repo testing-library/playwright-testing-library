@@ -92,6 +92,20 @@ const createFindQuery =
     return locator
   }
 
+/**
+ * Given a `Page` or `Locator` instance, return an object of Testing Library
+ * query methods that return a `Locator` instance for the queried element
+ *
+ * @internal this API is not currently intended for public usage and may be
+ * removed or changed outside of semantic release versioning. If possible, you
+ * should use the `locatorFixtures` with **@playwright/test** instead.
+ * @see {@link locatorFixtures}
+ *
+ * @param pageOrLocator `Page` or `Locator` instance to use as the query root
+ * @param config Testing Library configuration to apply to queries
+ *
+ * @returns object containing scoped Testing Library query methods
+ */
 const queriesFor = (pageOrLocator: Page | Locator, config?: Partial<Config>) =>
   allQueryNames.reduce(
     (rest, query) => ({
