@@ -180,13 +180,13 @@ test.describe('lib/fixture.ts (locators)', () => {
     test.afterEach(async ({page}) => page.close())
 
     test('should handle the findBy* methods', async ({queries}) => {
-      const locator = await queries.findByText('Loaded!', undefined, {timeout: 7000})
+      const locator = await queries.findByText('Loaded!', undefined, {timeout: 3000})
 
       expect(await locator.textContent()).toEqual('Loaded!')
     })
 
     test('should handle the findAllBy* methods', async ({queries}) => {
-      const locator = await queries.findAllByText(/Hello/, undefined, {timeout: 7000})
+      const locator = await queries.findAllByText(/Hello/, undefined, {timeout: 3000})
 
       const text = await Promise.all([locator.nth(0).textContent(), locator.nth(1).textContent()])
 
@@ -194,7 +194,7 @@ test.describe('lib/fixture.ts (locators)', () => {
     })
 
     test('throws Testing Library error when locator times out', async ({queries}) => {
-      const query = async () => queries.findByText(/Loaded!/, undefined, {timeout: 1000})
+      const query = async () => queries.findByText(/Loaded!/, undefined, {timeout: 500})
 
       await expect(query).rejects.toThrowError(
         expect.objectContaining({
@@ -204,7 +204,7 @@ test.describe('lib/fixture.ts (locators)', () => {
     })
 
     test('throws Testing Library error when multi-element locator times out', async ({queries}) => {
-      const query = async () => queries.findAllByText(/Hello/, undefined, {timeout: 1000})
+      const query = async () => queries.findAllByText(/Hello/, undefined, {timeout: 500})
 
       await expect(query).rejects.toThrowError(
         expect.objectContaining({
@@ -214,7 +214,7 @@ test.describe('lib/fixture.ts (locators)', () => {
     })
 
     test.describe('configuring asynchronous queries via `use`', () => {
-      test.use({asyncUtilTimeout: 7000})
+      test.use({asyncUtilTimeout: 3000})
 
       test('reads timeout configuration from `use` configuration', async ({queries, page}) => {
         // Ensure this test fails if we don't set `timeout` correctly in the `waitFor` in our find query
@@ -232,7 +232,7 @@ test.describe('lib/fixture.ts (locators)', () => {
       await expect(queries.getByText('Hidden')).toBeHidden()
 
       const locator = await queries.findByText('Hidden', undefined, {
-        timeout: 7000,
+        timeout: 3000,
         state: 'visible',
       })
 
@@ -245,7 +245,7 @@ test.describe('lib/fixture.ts (locators)', () => {
       test('waits for hidden element to be visible', async ({queries}) => {
         await expect(queries.getByText('Hidden')).toBeHidden()
 
-        const locator = await queries.findByText('Hidden', undefined, {timeout: 7000})
+        const locator = await queries.findByText('Hidden', undefined, {timeout: 3000})
 
         expect(await locator.textContent()).toEqual('Hidden')
       })
@@ -257,7 +257,7 @@ test.describe('lib/fixture.ts (locators)', () => {
       await expect(queries.queryByText('Attached')).toHaveCount(0)
 
       const locator = await queries.findByText('Attached', undefined, {
-        timeout: 7000,
+        timeout: 3000,
         state: 'attached',
       })
 
@@ -271,7 +271,7 @@ test.describe('lib/fixture.ts (locators)', () => {
       test('waits for hidden element to be attached', async ({queries}) => {
         await expect(queries.queryByText('Attached')).toHaveCount(0)
 
-        const locator = await queries.findByText('Attached', undefined, {timeout: 7000})
+        const locator = await queries.findByText('Attached', undefined, {timeout: 3000})
 
         expect(await locator.textContent()).toEqual('Attached')
         await expect(locator).toBeHidden()
