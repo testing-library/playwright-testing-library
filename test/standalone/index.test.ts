@@ -179,7 +179,7 @@ describe('lib/index.ts', () => {
       afterEach(async () => page.goto(`file://${path.join(__dirname, '../fixtures/page.html')}`))
 
       it('supports configuring timeout for findBy* queries', async () => {
-        configure({asyncUtilTimeout: 9000})
+        configure({asyncUtilTimeout: 3000})
 
         const element = await queries.findByText(await getDocument(page), 'Loaded!')
 

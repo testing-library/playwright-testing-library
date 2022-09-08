@@ -202,12 +202,12 @@ test.describe('lib/fixture.ts', () => {
 
     test('should handle the findBy* methods', async ({queries}) => {
       const {findByText} = queries
-      expect(await findByText('Loaded!', {}, {timeout: 7000})).toBeTruthy()
+      expect(await findByText('Loaded!', {}, {timeout: 3000})).toBeTruthy()
     })
 
     test('should handle the findByAll* methods', async ({queries}) => {
       const {findAllByText} = queries
-      const elements = await findAllByText(/Hello/, {}, {timeout: 7000})
+      const elements = await findAllByText(/Hello/, {}, {timeout: 3000})
       expect(elements).toHaveLength(2)
 
       const text = await Promise.all([elements[0].textContent(), elements[1].textContent()])
