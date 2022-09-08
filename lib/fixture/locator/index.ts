@@ -6,4 +6,4 @@ export {
   withinFixture,
 } from './fixtures'
 export type {Queries} from './fixtures'
-export {queriesFor} from './helpers'
+export {queriesFor} from './queries'
