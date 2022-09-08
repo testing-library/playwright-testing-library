@@ -170,6 +170,16 @@ test.describe('lib/fixture.ts (locators)', () => {
         })
       })
     })
+
+    test('screen fixture responds to Page and Query methods', async ({screen}) => {
+      const locator = screen.getByRole('button', {name: /getBy.*Test/})
+      expect(await locator.textContent()).toEqual('getByRole Test')
+
+      await screen.goto(`file://${path.join(__dirname, '../fixtures/late-page.html')}`)
+
+      const delayedLocator = await screen.findByText('Loaded!', undefined, {timeout: 3000})
+      expect(await delayedLocator.textContent()).toEqual('Loaded!')
+    })
   })
 
   test.describe('deferred page', () => {
