@@ -4,13 +4,14 @@ import {selectors} from '@playwright/test'
 import type {
   Config,
   LocatorQueries as Queries,
+  Screen,
   SelectorEngine,
   SynchronousQuery,
   Within,
 } from '../types'
 
-import {buildTestingLibraryScript, queryToSelector} from './helpers'
-import {isAllQuery, queriesFor, synchronousQueryNames} from './queries'
+import {buildTestingLibraryScript, includes, queryToSelector} from './helpers'
+import {allQueryNames, isAllQuery, queriesFor, synchronousQueryNames} from './queries'
 
 type TestArguments = PlaywrightTestArgs & Config
 
@@ -28,6 +29,24 @@ const queriesFixture: TestFixture<Queries, TestArguments> = async (
   {page, asyncUtilExpectedState, asyncUtilTimeout},
   use,
 ) => use(queriesFor(page, {asyncUtilExpectedState, asyncUtilTimeout}))
+
+const screenFixture: TestFixture<Screen, TestArguments> = async (
+  {page, asyncUtilExpectedState, asyncUtilTimeout},
+  use,
+) => {
+  const queries = queriesFor(page, {asyncUtilExpectedState, asyncUtilTimeout})
+  const revocable = Proxy.revocable(page, {
+    get(target, property, receiver) {
+      return includes(allQueryNames, property)
+        ? queries[property]
+        : Reflect.get(target, property, receiver)
+    },
+  })
+
+  await use(revocable.proxy as Screen)
+
+  revocable.revoke()
+}
 
 const withinFixture: TestFixture<Within, TestArguments> = async (
   {asyncUtilExpectedState, asyncUtilTimeout},
@@ -117,6 +136,7 @@ export {
   options,
   queriesFixture,
   registerSelectorsFixture,
+  screenFixture,
   withinFixture,
 }
 export type {Queries}
