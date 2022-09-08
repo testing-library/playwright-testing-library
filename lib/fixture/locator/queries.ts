@@ -44,17 +44,18 @@ const createFindQuery =
       )}`,
     )
 
-    const {state = asyncUtilExpectedState, timeout = asyncUtilTimeout} = waitForElementOptions ?? {}
+    const {state: expectedState = asyncUtilExpectedState, timeout = asyncUtilTimeout} =
+      waitForElementOptions ?? {}
 
     try {
-      await locator.first().waitFor({state, timeout})
+      await locator.first().waitFor({state: expectedState, timeout})
     } catch (error) {
       // In the case of a `waitFor` timeout from Playwright, we want to
       // surface the appropriate error from Testing Library, so run the
       // query one more time as `get*` knowing that it will fail with the
       // error that we want the user to see instead of the `TimeoutError`
       if (error instanceof errors.TimeoutError) {
-        return pageOrLocator
+        const timeoutLocator = pageOrLocator
           .locator(
             `${queryToSelector(findQueryToGetQuery(query))}=${JSON.stringify(
               synchronousOptions,
@@ -62,7 +63,18 @@ const createFindQuery =
             )}`,
           )
           .first()
-          .waitFor({state, timeout: 100})
+
+        // Handle case where element is attached, but hidden, and the expected
+        // state is set to `visible`. In this case, dereferencing the
+        // `Locator` instance won't throw a `get*` query error, so just
+        // surface the original Playwright timeout error
+        if (expectedState === 'visible' && !(await timeoutLocator.isVisible())) {
+          throw error
+        }
+
+        // In all other cases, dereferencing the `Locator` instance here should
+        // cause the above `get*` query to throw an error in Testing Library
+        return timeoutLocator.waitFor({state: expectedState, timeout})
       }
 
       throw error
