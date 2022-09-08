@@ -203,6 +203,32 @@ test.describe('lib/fixture.ts (locators)', () => {
       )
     })
 
+    test('throws Playwright error when locator times out for visible state (but is attached)', async ({
+      queries,
+    }) => {
+      const query = async () =>
+        queries.findByText(/Hidden/, undefined, {state: 'visible', timeout: 500})
+
+      await expect(query).rejects.toThrowError(
+        expect.objectContaining({
+          message: expect.stringContaining('500'),
+        }),
+      )
+    })
+
+    test('throws Testing Library error when locator times out for attached state', async ({
+      queries,
+    }) => {
+      const query = async () =>
+        queries.findByText(/Loaded!/, undefined, {state: 'attached', timeout: 500})
+
+      await expect(query).rejects.toThrowError(
+        expect.objectContaining({
+          message: expect.stringContaining('TestingLibraryElementError'),
+        }),
+      )
+    })
+
     test('throws Testing Library error when multi-element locator times out', async ({queries}) => {
       const query = async () => queries.findAllByText(/Hello/, undefined, {timeout: 500})
 
