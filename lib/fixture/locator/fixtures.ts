@@ -9,13 +9,8 @@ import type {
   Within,
 } from '../types'
 
-import {
-  buildTestingLibraryScript,
-  isAllQuery,
-  queriesFor,
-  queryToSelector,
-  synchronousQueryNames,
-} from './helpers'
+import {buildTestingLibraryScript, queryToSelector} from './helpers'
+import {isAllQuery, queriesFor, synchronousQueryNames} from './queries'
 
 type TestArguments = PlaywrightTestArgs & Config
 
