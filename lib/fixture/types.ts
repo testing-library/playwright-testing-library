@@ -1,4 +1,4 @@
-import {Locator} from '@playwright/test'
+import {Locator, Page} from '@playwright/test'
 import type * as TestingLibraryDom from '@testing-library/dom'
 import {queries} from '@testing-library/dom'
 
@@ -51,7 +51,9 @@ type KebabCase<S> = S extends `${infer C}${infer T}`
   : S
 
 export type LocatorQueries = {[K in keyof Queries]: ConvertQuery<Queries[K]>}
+
 export type Within = (locator: Locator) => LocatorQueries
+export type Screen = LocatorQueries & Page
 
 export type Query = keyof Queries
 

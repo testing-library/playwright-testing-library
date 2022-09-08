@@ -2,21 +2,23 @@ import {Fixtures} from '@playwright/test'
 
 import type {Queries as ElementHandleQueries} from './element-handle'
 import {queriesFixture as elementHandleQueriesFixture} from './element-handle'
-import type {Queries as LocatorQueries} from './locator'
 import {
+  Queries as LocatorQueries,
   installTestingLibraryFixture,
   queriesFixture as locatorQueriesFixture,
   options,
   queriesFor,
   registerSelectorsFixture,
+  screenFixture,
   withinFixture,
 } from './locator'
-import type {Config} from './types'
+import type {Config, Screen} from './types'
 import {Within} from './types'
 
 const elementHandleFixtures: Fixtures = {queries: elementHandleQueriesFixture}
 const locatorFixtures: Fixtures = {
   queries: locatorQueriesFixture,
+  screen: screenFixture,
   within: withinFixture,
   registerSelectors: registerSelectorsFixture,
   installTestingLibrary: installTestingLibraryFixture,
@@ -29,6 +31,7 @@ interface ElementHandleFixtures {
 
 interface LocatorFixtures extends Partial<Config> {
   queries: LocatorQueries
+  screen: Screen
   within: Within
   registerSelectors: void
   installTestingLibrary: void

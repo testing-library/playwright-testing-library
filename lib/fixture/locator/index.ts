@@ -3,6 +3,7 @@ export {
   options,
   queriesFixture,
   registerSelectorsFixture,
+  screenFixture,
   withinFixture,
 } from './fixtures'
 export type {Queries} from './fixtures'
