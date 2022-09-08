@@ -47,6 +47,9 @@ jobs:
           npm install playwright@${{ matrix.playwright }}
           npm install @playwright/test@${{ matrix.playwright }}
 
+      - name: Check types
+        run: npm run test:types
+
       - name: Check types, run lint + tests
         run: |
           npm why playwright
