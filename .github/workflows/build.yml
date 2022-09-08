@@ -13,12 +13,16 @@ on:
 
 jobs:
   build:
-    name: Build + Test + Release / Node ${{ matrix.node }}
+    name: Build + Test + Release / Node ${{ matrix.node }} / playwright@${{ matrix.playwright }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node: ['12', '14', '16']
-        playwright: ['1.12.0', 'latest']
+        # TODO: technically we still support down to 1.12 but `locator.waitFor`
+        # was introduced in 1.16 so anything earlier blows up type-checking.
+        # This minimum will be bumped in the next breaking release that will be
+        # entirely built around the `Locator` APIs, so update this then.
+        playwright: ['1.16.0', 'latest']
 
     steps:
       - name: Checkout
@@ -50,14 +54,14 @@ jobs:
       - name: Check types
         run: npm run test:types
 
-      - name: Check types, run lint + tests
+      - name: Run lint + tests
         if: ${{ matrix.playwright == 'latest' }}
         run: |
           npm why playwright
           npm why @playwright/test
           npm run test
 
-      - name: Check types, run lint + tests
+      - name: Run lint + tests
         if: ${{ matrix.playwright != 'latest' }}
         run: |
           npm why playwright
