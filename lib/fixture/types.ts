@@ -5,6 +5,7 @@ import {queries} from '@testing-library/dom'
 import type {Config as CommonConfig} from '../common'
 
 import {reviver} from './helpers'
+import type {LocatorPromise} from './locator'
 
 /**
  * This type was copied across from Playwright
@@ -22,15 +23,23 @@ export type SelectorEngine = {
   queryAll(root: HTMLElement, selector: string): HTMLElement[]
 }
 
+type KebabCase<S> = S extends `${infer C}${infer T}`
+  ? T extends Uncapitalize<T>
+    ? `${Uncapitalize<C>}${KebabCase<T>}`
+    : `${Uncapitalize<C>}-${KebabCase<T>}`
+  : S
+
 type Queries = typeof queries
 type WaitForState = Exclude<Parameters<Locator['waitFor']>[0], undefined>['state']
 type AsyncUtilExpectedState = Extract<WaitForState, 'visible' | 'attached'>
+
+export type TestingLibraryLocator = Locator & {within: () => LocatorQueries}
 
 type ConvertQuery<Query extends Queries[keyof Queries]> = Query extends (
   el: HTMLElement,
   ...rest: infer Rest
 ) => HTMLElement | (HTMLElement[] | null) | (HTMLElement | null)
-  ? (...args: Rest) => Locator
+  ? (...args: Rest) => TestingLibraryLocator
   : Query extends (
       el: HTMLElement,
       id: infer Id,
@@ -41,23 +50,31 @@ type ConvertQuery<Query extends Queries[keyof Queries]> = Query extends (
       id: Id,
       options?: Options,
       waitForOptions?: WaitForOptions & {state?: AsyncUtilExpectedState},
-    ) => Promise<Locator>
+    ) => LocatorPromise
   : never
-
-type KebabCase<S> = S extends `${infer C}${infer T}`
-  ? T extends Uncapitalize<T>
-    ? `${Uncapitalize<C>}${KebabCase<T>}`
-    : `${Uncapitalize<C>}-${KebabCase<T>}`
-  : S
 
 export type LocatorQueries = {[K in keyof Queries]: ConvertQuery<Queries[K]>}
 
-export type WithinReturn<Root extends Locator | Page> = Root extends Page ? Screen : LocatorQueries
+type ConvertQueryDeferred<Query extends LocatorQueries[keyof LocatorQueries]> = Query extends (
+  ...rest: infer Rest
+) => any
+  ? (...args: Rest) => LocatorPromise
+  : never
+
+export type DeferredLocatorQueries = {
+  [K in keyof LocatorQueries]: ConvertQueryDeferred<LocatorQueries[K]>
+}
+
+export type WithinReturn<Root extends QueryRoot> = Root extends Page ? Screen : QueriesReturn<Root>
+export type QueriesReturn<Root extends QueryRoot> = Root extends LocatorPromise
+  ? DeferredLocatorQueries
+  : LocatorQueries
+
+export type QueryRoot = Page | Locator | LocatorPromise
 export type Screen = LocatorQueries & Page
-export type Within = <Root extends Locator | Page>(locator: Root) => WithinReturn<Root>
+export type Within = <Root extends QueryRoot>(locator: Root) => WithinReturn<Root>
 
 export type Query = keyof Queries
-
 export type AllQuery = Extract<Query, `${string}All${string}`>
 export type FindQuery = Extract<Query, `find${string}`>
 export type GetQuery = Extract<Query, `get${string}`>

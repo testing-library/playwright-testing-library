@@ -1,10 +1,11 @@
-import type {Locator, PlaywrightTestArgs, TestFixture} from '@playwright/test'
-import {Page, selectors} from '@playwright/test'
+import type {PlaywrightTestArgs, TestFixture} from '@playwright/test'
+import {selectors} from '@playwright/test'
 
 import type {TestingLibraryDeserializedFunction as DeserializedFunction} from '../helpers'
 import type {
   Config,
   LocatorQueries as Queries,
+  QueryRoot,
   Screen,
   SelectorEngine,
   SynchronousQuery,
@@ -47,10 +48,10 @@ const withinFixture: TestFixture<Within, TestArguments> = async (
   {asyncUtilExpectedState, asyncUtilTimeout},
   use,
 ) =>
-  use(<Root extends Page | Locator>(root: Root) =>
+  use(<Root extends QueryRoot>(root: Root) =>
     'goto' in root
-      ? screenFor(root, {asyncUtilExpectedState, asyncUtilTimeout}).proxy
-      : (queriesFor(root, {asyncUtilExpectedState, asyncUtilTimeout}) as WithinReturn<Root>),
+      ? (screenFor(root, {asyncUtilExpectedState, asyncUtilTimeout}).proxy as WithinReturn<Root>)
+      : (queriesFor<Root>(root, {asyncUtilExpectedState, asyncUtilTimeout}) as WithinReturn<Root>),
   )
 
 type SynchronousQueryParameters = Parameters<Queries[SynchronousQuery]>
