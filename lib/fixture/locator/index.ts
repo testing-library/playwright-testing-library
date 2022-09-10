@@ -1,3 +1,6 @@
+export type {Queries} from './fixtures'
+export type {LocatorPromise} from './queries'
+
 export {
   installTestingLibraryFixture,
   options,
@@ -6,5 +9,4 @@ export {
   screenFixture,
   withinFixture,
 } from './fixtures'
-export type {Queries} from './fixtures'
 export {queriesFor} from './queries'

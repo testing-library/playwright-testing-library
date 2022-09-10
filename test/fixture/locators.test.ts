@@ -410,4 +410,139 @@ test.describe('lib/fixture.ts (locators)', () => {
       })
     })
   })
+
+  test.describe('query chaining', () => {
+    test.use({asyncUtilTimeout: 3000})
+
+    test.beforeEach(async ({page}) => {
+      await page.goto(`file://${path.join(__dirname, '../fixtures/chaining.html')}`)
+    })
+
+    test.afterEach(async ({page}) => page.close())
+
+    test('chaining synchronous queries', async ({screen}) => {
+      const locator = screen.getByRole('figure').within().getByText('Some image')
+
+      expect(await locator.textContent()).toEqual('Some image')
+    })
+
+    test('chaining an asynchronous query onto a synchronous query', async ({screen}) => {
+      const locator = await screen.getByRole('figure').within().findByRole('img')
+
+      expect(await locator.getAttribute('alt')).toEqual('Some image')
+    })
+
+    test('chaining a synchronous query onto an asynchronous query', async ({screen}) => {
+      const locator = await screen.findByRole('dialog').within().getByRole('textbox')
+
+      expect(await locator.getAttribute('type')).toEqual('text')
+    })
+
+    test('chaining multiple synchronous queries onto an asynchronous query', async ({screen}) => {
+      const locator = await screen
+        .findByRole('dialog')
+        .within()
+        .getByTestId('image-container')
+        .within()
+        .getByRole('img')
+
+      expect(await locator.getAttribute('alt')).toEqual('Some modal image')
+    })
+
+    test('chaining an asynchronous query between synchronous queries', async ({screen}) => {
+      const locator = await screen
+        .getByTestId('modal-container')
+        .within()
+        .findByRole('dialog')
+        .within()
+        .getByRole('img')
+
+      expect(await locator.getAttribute('alt')).toEqual('Some modal image')
+    })
+
+    test('chaining multiple asynchronous queries', async ({screen}) => {
+      const locator = await screen
+        .findByRole('dialog')
+        .within()
+        .findByRole('button', {name: 'Close'})
+
+      expect(await locator.textContent()).toEqual('Close')
+    })
+
+    test('chaining multiple asynchronous queries between synchronous queries', async ({screen}) => {
+      const locator = await screen
+        .getByTestId('modal-container')
+        .within()
+        .findByRole('dialog')
+        .within()
+        .findByRole('alert')
+        .within()
+        .getByRole('button', {name: 'Close'})
+
+      expect(await locator.textContent()).toEqual('Close')
+    })
+
+    test.describe('configuring chained queries', () => {
+      test.use({
+        testIdAttribute: 'data-customid',
+        asyncUtilTimeout: 1000,
+        actionTimeout: 2000,
+      })
+
+      test('chained asynchronous queries inherit `asyncUtilTimeout`', async ({screen}) => {
+        screen.setDefaultTimeout(3000)
+
+        const query = async () => screen.getByRole('figure').within().findByRole('img')
+
+        await expect(query).rejects.toThrowError(
+          expect.objectContaining({
+            message: expect.stringContaining('TestingLibraryElementError'),
+          }),
+        )
+      })
+
+      test('chained asynchronous queries inherit `testIdAttribute`', async ({screen}) => {
+        const locator = await screen
+          .getByRole('figure')
+          .within()
+          .findByTestId('some-image', undefined, {timeout: 3000})
+
+        expect(await locator.getAttribute('alt')).toEqual('Some image')
+      })
+
+      test('subsequent chained asynchronous queries inherit `asyncUtilTimeout`', async ({
+        screen,
+      }) => {
+        const query = async () =>
+          screen
+            .findByRole('dialog', undefined, {timeout: 3000}) // We want this one to succeed
+            .within()
+            .findByRole('button', {name: 'Close'}) // This should inherit the `1000` timeout and fail
+
+        await expect(query).rejects.toThrowError(
+          expect.objectContaining({
+            message: expect.stringContaining('TestingLibraryElementError'),
+          }),
+        )
+      })
+
+      test('synchronous query with multiple chained asynchronous queries inherit `asyncUtilTimeout`', async ({
+        screen,
+      }) => {
+        const query = async () =>
+          screen
+            .getByTestId('modal-container-custom-id')
+            .within()
+            .findByRole('dialog', undefined, {timeout: 3000}) // We want this one to succeed
+            .within()
+            .findByRole('button', {name: 'Close'}) // This should inherit the `1000` timeout and fail
+
+        await expect(query).rejects.toThrowError(
+          expect.objectContaining({
+            message: expect.stringContaining('TestingLibraryElementError'),
+          }),
+        )
+      })
+    })
+  })
 })
