@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <figure id="figure">
+      <div id="image">Loading...</div>
+      <figcaption>Some image</figcaption>
+    </figure>
+    <script>
+      setTimeout(() => {
+        const image = document.createElement('img')
+
+        image.src = 'data:image/png;base64,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'
+        image.alt = 'Some image'
+
+        const input = document.createElement('input')
+
+        input.type = 'text'
+        input.value = 'Input'
+
+        const modal = document.createElement('dialog')
+        const modalDiv = document.createElement('div')
+        const modalImage = image.cloneNode()
+        
+        modalDiv.dataset.testid = 'image-container'
+        modalDiv.appendChild(modalImage)
+
+        modal.style.display = 'block'
+        modal.appendChild(input)
+        modal.appendChild(modalDiv)
+
+        document.body.appendChild(modal)
+
+        const imageSpinner = document.querySelector('#image')
+
+        document.querySelector('#figure').replaceChild(image, imageSpinner)
+      }, 2000)
+    </script>
+  </body>
+</html>

@@ -35,7 +35,7 @@ const screenFixture: TestFixture<Screen, TestArguments> = async (
   use,
 ) => {
   const queries = queriesFor(page, {asyncUtilExpectedState, asyncUtilTimeout})
-  const revocable = Proxy.revocable(page, {
+  const {proxy, revoke} = Proxy.revocable(page, {
     get(target, property, receiver) {
       return includes(allQueryNames, property)
         ? queries[property]
@@ -43,9 +43,9 @@ const screenFixture: TestFixture<Screen, TestArguments> = async (
     },
   })
 
-  await use(revocable.proxy as Screen)
+  await use(proxy as Screen)
 
-  revocable.revoke()
+  revoke()
 }
 
 const withinFixture: TestFixture<Within, TestArguments> = async (

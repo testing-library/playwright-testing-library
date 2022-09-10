@@ -314,4 +314,43 @@ test.describe('lib/fixture.ts (locators)', () => {
       })
     })
   })
+
+  test.describe('query chaining', () => {
+    test.use({asyncUtilTimeout: 3000})
+
+    test.beforeEach(async ({page}) => {
+      await page.goto(`file://${path.join(__dirname, '../fixtures/chaining.html')}`)
+    })
+
+    test.afterEach(async ({page}) => page.close())
+
+    test('chaining synchronous queries', async ({screen}) => {
+      const locator = screen.getByRole('figure').within().getByText('Some image')
+
+      expect(await locator.textContent()).toEqual('Some image')
+    })
+
+    test('chaining an asynchronous query onto a synchronous query', async ({screen}) => {
+      const locator = await screen.getByRole('figure').within().findByRole('img')
+
+      expect(await locator.getAttribute('alt')).toEqual('Some image')
+    })
+
+    test('chaining a synchronous query onto an asynchronous query', async ({screen}) => {
+      const locator = await screen.findByRole('dialog').within().getByRole('textbox')
+
+      expect(await locator.getAttribute('type')).toEqual('text')
+    })
+
+    test('chaining multiple synchronous queries onto asynchronous query', async ({screen}) => {
+      const locator = await screen
+        .findByRole('dialog')
+        .within()
+        .getByTestId('image-container')
+        .within()
+        .getByRole('img')
+
+      expect(await locator.getAttribute('alt')).toEqual('Some image')
+    })
+  })
 })
