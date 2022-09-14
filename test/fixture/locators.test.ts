@@ -149,6 +149,25 @@ test.describe('lib/fixture.ts (locators)', () => {
       expect(await innerLocator.count()).toBe(1)
     })
 
+    test('when `Page` instance is provided, `within` returns a `Screen`', async ({
+      page,
+      within,
+    }) => {
+      const screen = within(page)
+
+      await screen.goto(`file://${path.join(__dirname, '../fixtures/page.html')}`)
+
+      const form = screen.queryByRole('form', {name: 'User'})
+
+      const {queryByLabelText} = within(form)
+
+      const outerLocator = queryByLabelText('Name')
+      const innerLocator = queryByLabelText('Username')
+
+      expect(await outerLocator.count()).toBe(0)
+      expect(await innerLocator.count()).toBe(1)
+    })
+
     test.describe('configuration', () => {
       test.describe('custom data-testid', () => {
         test.use({testIdAttribute: 'data-id'})
