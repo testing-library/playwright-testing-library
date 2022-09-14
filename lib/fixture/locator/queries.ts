@@ -11,10 +11,11 @@ import type {
   LocatorQueries as Queries,
   Query,
   QueryQuery,
+  Screen,
   SynchronousQuery,
 } from '../types'
 
-import {queryToSelector} from './helpers'
+import {includes, queryToSelector} from './helpers'
 
 const isAllQuery = (query: Query): query is AllQuery => query.includes('All')
 
@@ -109,4 +110,13 @@ const queriesFor = (pageOrLocator: Page | Locator, config?: Partial<Config>) =>
     {} as Queries,
   )
 
-export {allQueryNames, isAllQuery, isNotFindQuery, queriesFor, synchronousQueryNames}
+const screenFor = (page: Page, config: Partial<Config>) =>
+  Proxy.revocable(page, {
+    get(target, property, receiver) {
+      return includes(allQueryNames, property)
+        ? queriesFor(page, config)[property]
+        : Reflect.get(target, property, receiver)
+    },
+  }) as {proxy: Screen; revoke: () => void}
+
+export {allQueryNames, isAllQuery, isNotFindQuery, queriesFor, screenFor, synchronousQueryNames}
