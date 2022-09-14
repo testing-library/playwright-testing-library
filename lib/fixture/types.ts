@@ -52,8 +52,9 @@ type KebabCase<S> = S extends `${infer C}${infer T}`
 
 export type LocatorQueries = {[K in keyof Queries]: ConvertQuery<Queries[K]>}
 
-export type Within = (locator: Locator) => LocatorQueries
+export type WithinReturn<Root extends Locator | Page> = Root extends Page ? Screen : LocatorQueries
 export type Screen = LocatorQueries & Page
+export type Within = <Root extends Locator | Page>(locator: Root) => WithinReturn<Root>
 
 export type Query = keyof Queries
 

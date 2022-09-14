@@ -1,5 +1,5 @@
 import type {Locator, PlaywrightTestArgs, TestFixture} from '@playwright/test'
-import {selectors} from '@playwright/test'
+import {Page, selectors} from '@playwright/test'
 
 import type {
   Config,
@@ -8,10 +8,11 @@ import type {
   SelectorEngine,
   SynchronousQuery,
   Within,
+  WithinReturn,
 } from '../types'
 
-import {buildTestingLibraryScript, includes, queryToSelector} from './helpers'
-import {allQueryNames, isAllQuery, queriesFor, synchronousQueryNames} from './queries'
+import {buildTestingLibraryScript, queryToSelector} from './helpers'
+import {isAllQuery, queriesFor, screenFor, synchronousQueryNames} from './queries'
 
 type TestArguments = PlaywrightTestArgs & Config
 
@@ -34,26 +35,21 @@ const screenFixture: TestFixture<Screen, TestArguments> = async (
   {page, asyncUtilExpectedState, asyncUtilTimeout},
   use,
 ) => {
-  const queries = queriesFor(page, {asyncUtilExpectedState, asyncUtilTimeout})
-  const revocable = Proxy.revocable(page, {
-    get(target, property, receiver) {
-      return includes(allQueryNames, property)
-        ? queries[property]
-        : Reflect.get(target, property, receiver)
-    },
-  })
+  const {proxy, revoke} = screenFor(page, {asyncUtilExpectedState, asyncUtilTimeout})
 
-  await use(revocable.proxy as Screen)
+  await use(proxy)
 
-  revocable.revoke()
+  revoke()
 }
 
 const withinFixture: TestFixture<Within, TestArguments> = async (
   {asyncUtilExpectedState, asyncUtilTimeout},
   use,
 ) =>
-  use(
-    (locator: Locator): Queries => queriesFor(locator, {asyncUtilExpectedState, asyncUtilTimeout}),
+  use(<Root extends Page | Locator>(root: Root) =>
+    'goto' in root
+      ? screenFor(root, {asyncUtilExpectedState, asyncUtilTimeout}).proxy
+      : (queriesFor(root, {asyncUtilExpectedState, asyncUtilTimeout}) as WithinReturn<Root>),
   )
 
 declare const queryName: SynchronousQuery
