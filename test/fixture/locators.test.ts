@@ -250,6 +250,19 @@ test.describe('lib/fixture.ts (locators)', () => {
 
         expect(await locator.textContent()).toEqual('Loaded!')
       })
+
+      test.describe('with custom test ID attribute from `use`', () => {
+        test.use({testIdAttribute: 'data-customid'})
+
+        test('reads test ID configuration from `use` configuration', async ({queries, page}) => {
+          // Ensure this test fails if we don't set `timeout` correctly in the `waitFor` in our find query
+          page.setDefaultTimeout(4000)
+
+          const locator = await queries.findByTestId('loaded')
+
+          expect(await locator.textContent()).toEqual('Loaded!')
+        })
+      })
     })
 
     test('waits for hidden element to be visible when `visible` is passed for state', async ({
