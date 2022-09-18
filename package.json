@@ -19,11 +19,12 @@
     "prepare:playwright-test:package": "jscodeshift -t ./playwright-test/rename-imports.ts --extensions=ts --parser=ts ./lib",
     "prepublishOnly": "npm run build",
     "start:standalone": "hover-scripts test",
-    "test": "run-s build:testing-library test:*",
+    "test": "run-s build:testing-library test:standalone test:fixture",
+    "test:legacy": "run-s build:testing-library test:standalone test:fixture:legacy",
     "test:fixture": "playwright test",
+    "test:fixture:legacy": "playwright test test/fixture/element-handles.test.ts",
     "test:standalone": "hover-scripts test --no-watch",
-    "test:types": "tsc --noEmit",
-    "validate": "run-s test"
+    "test:types": "tsc --noEmit"
   },
   "repository": {
     "type": "git",
@@ -48,7 +49,7 @@
     }
   },
   "dependencies": {
-    "@testing-library/dom": "^7.31.2",
+    "@testing-library/dom": "^8.18.0",
     "wait-for-expect": "^3.0.2"
   },
   "devDependencies": {
