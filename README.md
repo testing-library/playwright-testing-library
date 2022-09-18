@@ -22,17 +22,18 @@
 
 <br>
 
-## ✨ Features
+## 🎛 Features
 
-All of your favorite user-centric querying functions from **@testing-library/react** and **@testing-library/dom** available from Playwright!
+All of your favorite user-centric querying functions from **@testing-library/react** and **@testing-library/dom** available from within Playwright!
 
-- Playwright Test [fixture](https://playwright.dev/docs/test-fixtures) — **`@playwright-testing-library/test/fixture`** or...
-- Standalone queries — **`playwright-testing-library`**/**`@playwright-testing-library/test`**
-- Asynchronous assertion helper (via **[wait-for-expect](https://github.com/TheBrainFamily/wait-for-expect)**)
+- Playwright Test [fixture](https://playwright.dev/docs/test-fixtures) for **@playwright/test** via **@playwright-testing-library/test**
+  - ✨ **New** — `Locator` queries fixture (`locatorFixtures`) [↓](#playwright-test-locator-fixture)
+  - `ElementHandle` queries fixture (`fixtures`) [↓](#legacy-playwright-test-fixture)
+- Standalone queries for **playwright** via **playwright-testing-library**
+  - `ElementHandle` queries (`getDocument` + `queries`) [↓](#standalone-playwright-queries)
+  - Asynchronous `waitFor` assertion helper (via **[wait-for-expect](https://github.com/TheBrainFamily/wait-for-expect)**)
 
-## 🌱 Getting Started
-
-### 1. Install
+## 🌱 Installation
 
 ```bash
 # For use with Playwright Test (@playwright/test)
@@ -40,75 +41,251 @@ npm install --save-dev @playwright-testing-library/test
 
 # For use with Playwright (playwright)
 npm install --save-dev playwright-testing-library
-
 ```
 
-### 2a. Use _Playwright Test [fixture](https://playwright.dev/docs/test-fixtures)_
+## 📝 Usage
+
+There are currently a few different ways to use Playwright Testing Library, depending, however using the `Locator` queries fixture with Playwright Test (**@playwright/test**) is the recommended approach.
+
+> ⚠️ The `ElementHandle` query APIs were created before Playwright introduced its `Locator` API and will be replaced in the next major version of Playwright Testing Library. If you can't use **@playwright/test** at the moment, you'll need to use the `ElementHandle` query API, but a migration path will be provided when we switch to the new `Locator` APIs.
+
+### Playwright Test Fixture
+
+Using the `Locator` Playwright Test (**@playwright/test**) fixture with **@playwright-testing-library/test**.
+
+#### Setup
 
 ```ts
-import {test as baseTest} from '@playwright/test'
-import {fixtures, within, TestingLibraryFixtures} from '@playwright-testing-library/test/fixture'
+import {test as base} from '@playwright/test'
+import {
+  locatorFixtures as fixtures,
+  LocatorFixtures as TestingLibraryFixtures,
+} from '@playwright-testing-library/test/fixture'
 
-// As only fixture
-const test = baseTest.extend<TestingLibraryFixtures>(fixtures)
-
-// Alternatively, with other fixtures
-interface Fixtures extends TestingLibraryFixtures {
-  // ... additional fixture types
-}
-
-const test = baseTest.extend<Fixtures>({
-  ...fixtures,
-  // ... additional fixtures
-})
+const test = base.extend<TestingLibraryFixtures>(fixtures)
 
 const {expect} = test
 
-// Query methods are available in `test` blocks
-test('my form', async ({queries: {getByTestId}}) => {
-  const $form = await getByTestId('my-form')
+test('my form', async ({screen, within}) => {
+  // Screen provides `Locator` queries scoped to current Playwright `Page`
+  const formLocator = screen.getByTestId('my-form')
 
-  // Scope queries with `within`
-  const {getByLabelText} = within($form)
+  // Scope queries to `Locator` with `within`
+  // (note that this is a fixture from `test`, not the `within` import)
+  const emailInputLocator = within(formLocator).getByLabelText('Email')
 
-  const $email = await getByLabelText('Email')
+  // Interact via `Locator` API 🥳
+  await emailInputLocator.fill('email@playwright.dev')
+  await emailInputLocator.press('Enter')
 
-  // Interact with Playwright like usual
-  await $email.type('playwright@example.com')
+  // Screen also provides Playwright's `Page` API
+  screen.goto('/account')
 
-  // ...
+  const emailLocator = screen.getByRole('heading', {level: 2})
+
+  // Assert via `Locator` APIs 🎉
+  await expect(emailLocator).toHaveText('email@playwright.dev')
 })
 ```
 
-### 2b. Use _standalone queries_
+#### Configuration
 
-```js
-const {webkit} = require('playwright') // or 'firefox' or 'chromium'
-const {getDocument, queries} = require('playwright-testing-library')
+The `Locator` query API is configured using Playwright's `use` API. See Playwright's documentation for [global](https://playwright.dev/docs/api/class-testconfig#test-config-use), [project](https://playwright.dev/docs/api/class-testproject#test-project-use), and [test](https://playwright.dev/docs/api/class-test#test-use).
 
-const {getByTestId, getByLabelText} = queries
+##### Global
 
-const browser = await webkit.launch()
-const page = await browser.newPage()
+Configuring Testing Library globally in `playwright.config.ts`
 
-// Grab ElementHandle for document
-const $document = await getDocument(page)
+```ts
+import type {PlaywrightTestConfig} from '@playwright/test'
 
-// Your favorite query methods are available
-const $form = await getByTestId($document, 'my-form')
+const config: PlaywrightTestConfig = {
+  use: {
+    // These are the defaults
+    testIdAttribute: 'data-testid',
+    asyncUtilTimeout: 1000,
+    asyncUtilExpectedState: 'visible',
+  },
+}
 
-// Returned elements are ElementHandles too!
-const $email = await getByLabelText($form, 'Email')
+export default config
+```
 
-// Interact with playwright like usual
-await $email.type('playwright@example.com')
+##### Local
 
-// ...
+Scoping Testing Library configuration to test suites or `describe` blocks
+
+```ts
+import {test as base} from '@playwright/test'
+import {
+  locatorFixtures as fixtures,
+  LocatorFixtures as TestingLibraryFixtures,
+} from '@playwright-testing-library/test/fixture'
+
+const test = base.extend<TestingLibraryFixtures>(fixtures)
+
+const {describe, expect, use} = test
+
+// Entire test suite
+use({testIdAttribute: 'data-custom-test-id'})
+
+describe(() => {
+  // Specific block
+  use({
+    testIdAttribute: 'some-other-test-id',
+    asyncUtilsTimeout: 5000,
+    asyncUtilExpectedState: 'attached',
+  })
+
+  test('my form', async ({screen}) => {
+    // ...
+  })
+})
+```
+
+### Legacy Playwright Test Fixture
+
+Using the `ElementHandle` Playwright Test (**@playwright/test**) fixture with **@playwright-testing-library/test**.
+
+> ⚠️ See note in [Usage](#-usage) as you should be using the `Locator` fixture if possible
+
+#### Setup
+
+```ts
+import {test as base} from '@playwright/test'
+import {fixtures, within, TestingLibraryFixtures} from '@playwright-testing-library/test/fixture'
+
+const test = base.extend<TestingLibraryFixtures>(fixtures)
+
+const {expect} = test
+
+test('my form', async ({page, queries}) => {
+  // Query methods are available in `test` blocks
+  const formHandle = await queries.getByTestId('my-form')
+
+  // Scope queries to an `ElementHandle` with `within`
+  const emailInputHandle = await within(formHandle).getByLabelText('Email')
+
+  // Interact via `ElementHandle` API
+  await emailInputHandle.fill('email@playwright.dev')
+  await emailInputHandle.press('Enter')
+
+  page.goto('/account')
+
+  const emailHandle = queries.getByRole('heading', {level: 2})
+
+  // Assert via `ElementHandle` APIs
+  expect(await emailHandle.textContent()).toEqual('email@playwright.dev')
+})
+```
+
+#### Configuration
+
+```ts
+import {test as base} from '@playwright/test'
+import {
+  configure,
+  fixtures,
+  within,
+  TestingLibraryFixtures,
+} from '@playwright-testing-library/test/fixture'
+
+const test = base.extend<TestingLibraryFixtures>(fixtures)
+
+const {beforeEach, describe, expect} = test
+
+// Global (these are the defaults)
+configure({asyncUtilTimeout: 1000, testIdAttribute: 'data-testid'})
+
+// Specific block
+describe('my page', () => {
+  beforeEach(() => configure({asyncUtilTimeout: 5000, testIdAttribute: 'data-custom-test-id'}))
+
+  afterEach(() => configure({}))
+
+  test('my form', async ({page, queries}) => {
+    // ...
+  })
+})
+```
+
+### Standalone Playwright Queries
+
+Using the `ElementHandle` queries with Playwright (**playwright**) and **playwright-testing-library**.
+
+> ⚠️ See note in [Usage](#-usage) as you should be using **@playwright/test** with the `Locator` fixture if possible. The `Locator` queries will be made available for standalone **playwright** in the next major release.
+
+```ts
+import {beforeAll, expect, jest, test} from '@jest/globals'
+import {webkit} from 'playwright' // or 'firefox' or 'chromium'
+import {getDocument, queries, within} from 'playwright-testing-library'
+
+let browser: playwright.Browser
+let page: playwright.Page
+
+beforeAll(() => {
+  const browser = await webkit.launch()
+  const page = await browser.newPage()
+})
+
+test('my form', () => {
+  // Get `ElementHandle` for document from `Page`
+  const documentHandle = await getDocument(page)
+
+  // Global query methods take document handle as the first parameter
+  const formHandle = await queries.getByTestId(documentHandle, 'my-form')
+
+  // Scope queries to an `ElementHandle` with `within`
+  const emailInputHandle = await within(formHandle).getByLabelText('Email')
+
+  // Interact via `ElementHandle` API
+  await emailInputHandle.fill('email@playwright.dev')
+  await emailInputHandle.press('Enter')
+
+  page.goto('/account')
+
+  const accountHandle = getDocument(page)
+  const emailHandle = queries.getByRole(accountHandle, 'heading', {level: 2})
+
+  // Assert via `ElementHandle` APIs
+  expect(await emailHandle.textContent()).toEqual('email@playwright.dev')
+})
+```
+
+#### Configuration
+
+```ts
+import {beforeEach, afterEach, expect, jest, test} from '@jest/globals'
+import {configure, getDocument, queries, within} from 'playwright-testing-library'
+
+// Global (these are the defaults)
+configure({asyncUtilTimeout: 1000, testIdAttribute: 'data-testid'})
+
+// Specific block
+describe('my page', () => {
+  beforeEach(() => configure({asyncUtilTimeout: 5000, testIdAttribute: 'data-custom-test-id'}))
+
+  afterEach(() => configure({}))
+
+  test('my form', async ({page, queries}) => {
+    // ...
+  })
+})
 ```
 
 ## 🔌 API
 
+### Testing Library
+
+All queries from **[@testing-library/dom](https://github.com/testing-library/dom-testing-library#usage)**  are supported.
+
+> 📝 The **`find*`** queries for the `Locator` queries return `Promise<Locator>` which resolves when the element is found before the timeout specified via `asyncUtilTimeout`
+
+### Additional
+
 Unique methods, not part of **@testing-library/dom**
+
+> ⚠️ These only apply to the `ElementHandle` queries
 
 - Get an `ElementHandle` for the document
 
@@ -126,72 +303,23 @@ Unique methods, not part of **@testing-library/dom**
   ): Promise<{}>
   ```
 
----
-
-The **[@testing-library/dom](https://github.com/testing-library/dom-testing-library#usage)** — All **`get*`**, **`query*`**, and **`find*`** methods are supported.
-
-- `getQueriesForElement(handle: ElementHandle): ElementHandle & QueryUtils` - extend the input object with the query API and return it
-- `getNodeText(handle: ElementHandle): Promise<string>` - get the text content of the element
-- `queries: QueryUtils` - the query subset of `@testing-library/dom` exports
-  - `queryByPlaceholderText`
-  - `queryAllByPlaceholderText`
-  - `getByPlaceholderText`
-  - `getAllByPlaceholderText`
-  - `findByPlaceholderText`
-  - `findAllByPlaceholderText`
-  - `queryByText`
-  - `queryAllByText`
-  - `getByText`
-  - `getAllByText`
-  - `findByText`
-  - `findAllByText`
-  - `queryByLabelText`
-  - `queryAllByLabelText`
-  - `getByLabelText`
-  - `getAllByLabelText`
-  - `findByLabelText`
-  - `findAllByLabelText`
-  - `queryByAltText`
-  - `queryAllByAltText`
-  - `getByAltText`
-  - `getAllByAltText`
-  - `findByAltText`
-  - `findAllByAltText`
-  - `queryByTestId`
-  - `queryAllByTestId`
-  - `getByTestId`
-  - `getAllByTestId`
-  - `findByTestId`
-  - `findAllByTestId`
-  - `queryByTitle`
-  - `queryAllByTitle`
-  - `getByTitle`
-  - `getAllByTitle`
-  - `findByTitle`
-  - `findAllByTitle`
-  - `queryByDisplayValue`,
-  - `queryAllByDisplayValue`,
-  - `getByDisplayValue`,
-  - `getAllByDisplayValue`,
-  - `findByDisplayValue`,
-  - `findAllByDisplayValue`,
-
 ## Known Limitations
 
-- Async utilities `waitForElement`, `waitForElementToBeRemoved` and `waitForDomChange` are not exposed. Consider using a `find*` query.
-- `fireEvent` method is not exposed, use Playwright's built-ins instead.
-- `expect` assertion extensions are not available.
+- Only `testIdAttribute` and `asyncUtilTimeout` are supported as configuration options
+- Async utilities `waitForElement`, `waitForElementToBeRemoved` and `waitForDomChange` are not exposed. Consider using a `find*` query or a Playwright built-in like [`Locator.waitFor()`](https://playwright.dev/docs/api/class-locator#locator-wait-for).
+- The `fireEvent` method is not exposed, use Playwright's built-ins instead.
+- Assertion extensions from [**jest-dom**](https://testing-library.com/docs/ecosystem-jest-dom/) are not compatible, use Playwright Test if possible.
+- The [`getNodeText()`](https://testing-library.com/docs/dom-testing-library/api-custom-queries/#getnodetext) function is not currently supported for `Locator`.
 
 ## Special Thanks
 
 - [pptr-testing-library](https://github.com/testing-library/pptr-testing-library)
-- [@testing-library/dom](https://github.com/testing-library/dom-testing-library) of course!
+- [@testing-library/dom](https://github.com/testing-library/dom-testing-library)
 
 ## Related Playwright Test Utilities
 
 - [jest-playwright](https://github.com/playwright-community/jest-playwright)
 - [expect-playwright](https://github.com/playwright-community/expect-playwright)
-- Yours! Name TBD, PR welcome ;)
 
 ## LICENSE
 
