@@ -45,7 +45,7 @@ npm install --save-dev playwright-testing-library
 
 ## 📝 Usage
 
-There are currently a few different ways to use Playwright Testing Library, depending, however using the `Locator` queries fixture with Playwright Test (**@playwright/test**) is the recommended approach.
+There are currently a few different ways to use Playwright Testing Library, depending on how you use Playwright. However, the recommended approach is using the `Locator` [queries fixture](#playwright-test-fixture) with Playwright Test (**@playwright/test**).
 
 > ⚠️ The `ElementHandle` query APIs were created before Playwright introduced its `Locator` API and will be replaced in the next major version of Playwright Testing Library. If you can't use **@playwright/test** at the moment, you'll need to use the `ElementHandle` query API, but a migration path will be provided when we switch to the new `Locator` APIs.
 
