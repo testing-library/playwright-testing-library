@@ -27,7 +27,7 @@
 All of your favorite user-centric querying functions from **@testing-library/react** and **@testing-library/dom** available from within Playwright!
 
 - Test [fixture](https://playwright.dev/docs/test-fixtures) for **@playwright/test** via **@playwright-testing-library/test**
-  - ✨ **New** — `Locator` queries fixture (`locatorFixtures`) [↓](#playwright-test-locator-fixture)
+  - ✨ **New** — `Locator` queries fixture (`locatorFixtures`) [↓](#playwright-test-fixture)
   - `ElementHandle` queries fixture (`fixtures`) [↓](#legacy-playwright-test-fixture)
 - Standalone queries for **playwright** via **playwright-testing-library**
   - `ElementHandle` queries (`getDocument` + `queries`) [↓](#standalone-playwright-queries)
