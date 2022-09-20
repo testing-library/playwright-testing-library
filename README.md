@@ -26,7 +26,7 @@
 
 All of your favorite user-centric querying functions from **@testing-library/react** and **@testing-library/dom** available from within Playwright!
 
-- Playwright Test [fixture](https://playwright.dev/docs/test-fixtures) for **@playwright/test** via **@playwright-testing-library/test**
+- Test [fixture](https://playwright.dev/docs/test-fixtures) for **@playwright/test** via **@playwright-testing-library/test**
   - ✨ **New** — `Locator` queries fixture (`locatorFixtures`) [↓](#playwright-test-locator-fixture)
   - `ElementHandle` queries fixture (`fixtures`) [↓](#legacy-playwright-test-fixture)
 - Standalone queries for **playwright** via **playwright-testing-library**
@@ -85,6 +85,27 @@ test('my form', async ({screen, within}) => {
 
   // Assert via `Locator` APIs 🎉
   await expect(emailLocator).toHaveText('email@playwright.dev')
+})
+```
+
+#### Async Methods
+
+The `findBy` queries work the same way as they do in [Testing Library core](https://testing-library.com/docs/dom-testing-library/api-async) in that they return `Promise<Locator>` and are intended to be used to defer test execution until an element appears on the page.
+
+```ts
+test('my modal', async ({screen, within}) => {
+  // Here we wait for a modal to appear asynchronously before continuing
+  // Note: the timeout for `findBy` queries is configured with `asyncUtilTimeout`
+  const modalLocator = await screen.findByRole('dialog')
+
+  // Once the modal is visible, we can interact with its contents and assert
+  await expect(modalLocator).toHaveText(/My Modal/)
+  await within(modalLocator).getByRole('button', {name: 'Okay'}).click()
+
+  // We can also use `queryBy` methods to take advantage of Playwright's `Locator` auto-waiting
+  // See: https://playwright.dev/docs/actionability
+  // Note: this will use Playwright's timeout, not `asyncUtilTimeout`
+  await expect(screen.queryByRole('dialog')).toBeHidden()
 })
 ```
 
@@ -277,7 +298,7 @@ describe('my page', () => {
 
 ### Testing Library
 
-All queries from **[@testing-library/dom](https://github.com/testing-library/dom-testing-library#usage)**  are supported.
+All queries from **[@testing-library/dom](https://github.com/testing-library/dom-testing-library#usage)** are supported.
 
 > 📝 The **`find*`** queries for the `Locator` queries return `Promise<Locator>` which resolves when the element is found before the timeout specified via `asyncUtilTimeout`
 
