@@ -3,6 +3,33 @@
   <body>
     <span>Loading...</span>
     <span id="hidden" style="visibility: hidden">Hidden</span>
+
+    <table style="display: none" id="table">
+      <tr data-testid="table-header-GroupCode" class="css-62m37e">
+        <th
+          data-testid="cl-table-header-column--active"
+          width="33.333333333333336%"
+          class="css-a6vx1b"
+        >
+          <span class="css-1a91zmr">Active</span>
+        </th>
+        <th
+          data-testid="cl-table-header-column--code"
+          width=" 33.333333333333336%"
+          class="css-a6vx1b"
+        >
+          <span class="css-1a91zmr.">Code</span>
+        </th>
+        <th
+          data-testid="cl-table-header-column--description"
+          width="33.333333333333336%"
+          class="css-a6vx1b"
+        >
+          <span class="css-1a91zmr">Description</span>
+        </th>
+      </tr>
+    </table>
+
     <script>
       setTimeout(() => {
         const loaded = document.createElement('span')
@@ -25,6 +52,8 @@
         attached.textContent = 'Attached'
         attached.style.visibility = 'hidden'
         document.body.appendChild(attached)
+
+        document.querySelector('#table').style = 'display: table'
       }, 2000)
     </script>
   </body>

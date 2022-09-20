@@ -222,6 +222,14 @@ test.describe('lib/fixture.ts (locators)', () => {
       expect(text).toEqual(['Hello h1', 'Hello h2'])
     })
 
+    test('should handle the findAllBy* methods with test ID RegExp', async ({screen}) => {
+      const header = await screen.findAllByTestId(/cl-table-header-column.*/, undefined, {
+        timeout: 3000,
+      })
+
+      await expect(header.nth(0)).toHaveText('Active')
+    })
+
     test('throws Testing Library error when locator times out', async ({queries}) => {
       const query = async () => queries.findByText(/Loaded!/, undefined, {timeout: 500})
 
