@@ -214,6 +214,15 @@ test.describe('lib/fixture.ts (locators)', () => {
       expect(await locator.textContent()).toEqual('Loaded!')
     })
 
+    test("queryBy* methods can be used with Playwright's laziness", async ({screen, within}) => {
+      const modalLocator = await screen.findByRole('dialog', undefined, {timeout: 3000})
+
+      await expect(modalLocator).toHaveText(/My Modal/)
+      await within(modalLocator).getByRole('button', {name: 'Okay'}).click()
+
+      await expect(screen.queryByRole('dialog')).toBeHidden()
+    })
+
     test('should handle the findAllBy* methods', async ({queries}) => {
       const locator = await queries.findAllByText(/Hello/, undefined, {timeout: 3000})
 

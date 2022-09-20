@@ -25,6 +25,25 @@
         attached.textContent = 'Attached'
         attached.style.visibility = 'hidden'
         document.body.appendChild(attached)
+
+        const modal = document.createElement('dialog')
+        const modalButton = document.createElement('button')
+        const modalHeader = document.createElement('h1')
+
+        modal.style.display = 'block'
+
+        modalButton.innerText = 'Okay'
+        modalButton.onclick = () => {
+          modal.innerText = 'Doing a thing...'
+          setTimeout(() => document.querySelector('dialog').remove(), 1000)
+        }
+
+        modalHeader.innerText = 'My Modal'
+
+        modal.appendChild(modalButton)
+        modal.appendChild(modalHeader)
+
+        document.body.appendChild(modal)
       }, 2000)
     </script>
   </body>
