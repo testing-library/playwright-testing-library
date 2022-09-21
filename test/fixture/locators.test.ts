@@ -119,6 +119,25 @@ test.describe('lib/fixture.ts (locators)', () => {
       expect(await hiddenElements.count()).toEqual(2)
     })
 
+    test.only('supports querying SVG by title', async ({screen}) => {
+      const svg = screen.getByRole('img', {name: 'Vector'})
+
+      expect(await svg.count()).toEqual(1)
+
+      await expect(svg.click()).resolves.not.toThrow()
+    })
+
+    test.only('clicking SVG title element', async ({screen, within}) => {
+      const svg = screen.getByRole('img', {name: 'Vector'})
+      const title = within(svg).getByText('Vector')
+
+      screen.setDefaultTimeout(1000)
+
+      expect(await title.count()).toEqual(1)
+
+      await expect(async () => title.click()).rejects.toThrow()
+    })
+
     test.describe('querying by role with `level` option', () => {
       test('retrieves the correct elements when querying all by role', async ({
         queries: {queryAllByRole},
