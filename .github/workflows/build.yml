@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: ['12', '14', '16']
+        node: ['14', '16', '18']
         # TODO: technically we still support down to 1.12 but `locator.waitFor`
         # was introduced in 1.16 so anything earlier blows up type-checking.
         # This minimum will be bumped in the next breaking release that will be
@@ -68,7 +68,7 @@ jobs:
           npm why @playwright/test
           npm run test:legacy
 
-      # Only release on Node 14
+      # Only release on Node 16
 
       - name: Upload Coverage / Release / Playwright
         run: npm run ci-after-success
@@ -99,13 +99,13 @@ jobs:
         run: echo ::set-output name=branch::${GITHUB_REF#refs/*/}
 
       - name: Release / Playwright Test (latest)
-        if: ${{ matrix.node == '14' && matrix.playwright == 'latest' && steps.did-release.outputs.released == 'true' && steps.branch.outputs.branch == 'main' }}
+        if: ${{ matrix.node == '16' && matrix.playwright == 'latest' && steps.did-release.outputs.released == 'true' && steps.branch.outputs.branch == 'main' }}
         run: |
           npm run prepare:playwright-test
           npm publish --access=public
 
       - name: Release / Playwright Test (pre-release)
-        if: ${{ matrix.node == '14' && matrix.playwright == 'latest' && steps.did-release.outputs.released == 'true' && steps.branch.outputs.branch != 'main' }}
+        if: ${{ matrix.node == '16' && matrix.playwright == 'latest' && steps.did-release.outputs.released == 'true' && steps.branch.outputs.branch != 'main' }}
         run: |
           npm run prepare:playwright-test
           npm publish --access=public --tag=${{ steps.branch.outputs.branch }}
