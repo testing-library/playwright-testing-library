@@ -40,6 +40,28 @@ test.describe('lib/fixture.ts (locators)', () => {
       expect(await locator.textContent()).toEqual('Hello h1')
     })
 
+    test('supports function style `TextMatch`', async ({screen}) => {
+      const locator = screen.getByText(
+        // eslint-disable-next-line prefer-arrow-callback, func-names
+        function (content, element) {
+          return content.startsWith('Hello') && element?.tagName.toLowerCase() === 'h3'
+        },
+      )
+
+      expect(locator).toBeTruthy()
+      expect(await locator.textContent()).toEqual('Hello h3')
+    })
+
+    test('supports arrow function style `TextMatch`', async ({screen}) => {
+      const locator = screen.getByText(
+        (content, element) =>
+          content.startsWith('Hello') && element?.tagName.toLowerCase() === 'h3',
+      )
+
+      expect(locator).toBeTruthy()
+      expect(await locator.textContent()).toEqual('Hello h3')
+    })
+
     test('should handle the get* methods', async ({queries: {getByTestId}}) => {
       const locator = getByTestId('testid-text-input')
 
