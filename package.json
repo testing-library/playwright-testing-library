@@ -23,6 +23,7 @@
     "test:legacy": "run-s build:testing-library test:standalone test:fixture:legacy",
     "test:fixture": "playwright test",
     "test:fixture:legacy": "playwright test test/fixture/element-handles.test.ts",
+    "test:fixture:locator": "playwright test test/fixture/locators.test.ts",
     "test:standalone": "hover-scripts test --no-watch",
     "test:types": "tsc --noEmit"
   },
