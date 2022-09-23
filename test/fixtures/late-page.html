@@ -3,6 +3,27 @@
   <body>
     <span>Loading...</span>
     <span id="hidden" style="visibility: hidden">Hidden</span>
+
+    <table data-testid="editable-nested-table-GroupCode" class="css-1n5gbw2" style="display: none;" id="table">
+      <tbody>
+        <tr data-testid="erow-GroupCode-0" class="css-105800b">
+          <td data-testid="etd-GroupCode-active-0" class="css-1f7ypku">
+            <label
+              for="input-GroupCode-active-0"
+              data-testid="checkbox-input-GroupCode-active-0"
+              class="css-1lua7zz"
+            >
+              <input type="checkbox" id="input-GroupCode-active-0" name="input-GroupCode-active-0" aria-labelledby="input-GroupCode-active-0" class="css-38lalc">
+              <span tabindex="0" class="css-12234rr">…</span>
+              <span class="css-1008avk"></span>
+            </label>
+          </td>
+          <td data-testid="td-GroupCode-code-0" class="css-1f7voku">01</td>
+          <td data-testid="td-GroupCode-description-0" class="css-1f7vpku">LINEHOLDER</td>
+        </tr>
+      </tbody>
+    </table>
+
     <script>
       setTimeout(() => {
         const loaded = document.createElement('span')
@@ -44,6 +65,9 @@
         modal.appendChild(modalHeader)
 
         document.body.appendChild(modal)
+
+        // Deferred Table
+        document.querySelector('#table').style = 'display: table'
       }, 2000)
     </script>
   </body>

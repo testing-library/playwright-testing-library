@@ -253,6 +253,20 @@ test.describe('lib/fixture.ts (locators)', () => {
       expect(text).toEqual(['Hello h1', 'Hello h2'])
     })
 
+    test.describe('accessible tables?', () => {
+      test.use({asyncUtilTimeout: 3000})
+
+      test.only('matches table row with `RegExp` text matcher', async ({screen, within}) => {
+        const table = await screen.findByTestId('editable-nested-table-GroupCode')
+        const row = within(table).getByRole('row', {name: /LINEHOLDER/})
+        const checkbox = within(row).getByRole('checkbox')
+
+        await expect(checkbox).not.toBeChecked()
+        await checkbox.check()
+        await expect(checkbox).toBeChecked()
+      })
+    })
+
     test('throws Testing Library error when locator times out', async ({queries}) => {
       const query = async () => queries.findByText(/Loaded!/, undefined, {timeout: 500})
 
