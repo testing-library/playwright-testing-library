@@ -330,7 +330,21 @@ Unique methods, not part of **@testing-library/dom**
 - Async utilities `waitForElement`, `waitForElementToBeRemoved` and `waitForDomChange` are not exposed. Consider using a `find*` query or a Playwright built-in like [`Locator.waitFor()`](https://playwright.dev/docs/api/class-locator#locator-wait-for).
 - The `fireEvent` method is not exposed, use Playwright's built-ins instead.
 - Assertion extensions from [**jest-dom**](https://testing-library.com/docs/ecosystem-jest-dom/) are not compatible, use Playwright Test if possible.
-- The [`getNodeText()`](https://testing-library.com/docs/dom-testing-library/api-custom-queries/#getnodetext) function is not currently supported for `Locator`.
+
+### Locator Queries
+
+- The [`getNodeText()`](https://testing-library.com/docs/dom-testing-library/api-custom-queries/#getnodetext) function is currently unsupported.
+- When using a function for [`TextMatch`](https://testing-library.com/docs/queries/about/#textmatch), the function cannot reference its closure scope
+
+  ```ts
+  // ✅ This is supported
+  screen.getByText(content => content.startsWith('Foo'))
+
+  // ❌ This is not supported
+  const startsWithFoo = (content: string) => content.startsWith('Foo')
+
+  screen.getByText(content => startsWithFoo(content))
+  ```
 
 ## Special Thanks
 
