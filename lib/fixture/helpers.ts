@@ -1,3 +1,13 @@
+class TestingLibraryDeserializedFunction extends Function {
+  original: string
+
+  constructor(fn: string) {
+    super(`return (${fn}).apply(this, arguments)`)
+
+    this.original = fn
+  }
+}
+
 const replacer = (_: string, value: unknown) => {
   if (value instanceof RegExp) return `__REGEXP ${value.toString()}`
   if (typeof value === 'function') return `__FUNCTION ${value.toString()}`
@@ -13,11 +23,10 @@ const reviver = (_: string, value: string) => {
   }
 
   if (value.toString().includes('__FUNCTION ')) {
-    // eslint-disable-next-line @typescript-eslint/no-implied-eval
-    return new Function(`return (${value.split('__FUNCTION ')[1]}).apply(this, arguments)`)
+    return new TestingLibraryDeserializedFunction(value.split('__FUNCTION ')[1])
   }
 
   return value
 }
 
-export {replacer, reviver}
+export {TestingLibraryDeserializedFunction, replacer, reviver}
