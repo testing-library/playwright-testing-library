@@ -1,7 +1,7 @@
 import {promises as fs} from 'fs'
 
 import {configureTestingLibraryScript} from '../../common'
-import {reviver} from '../helpers'
+import {TestingLibraryDeserializedFunction, reviver} from '../helpers'
 import type {Config, Selector, SynchronousQuery} from '../types'
 
 const queryToSelector = (query: SynchronousQuery) =>
@@ -17,8 +17,9 @@ const buildTestingLibraryScript = async ({config}: {config: Config}) => {
 
   return `
     ${configuredTestingLibraryDom}
-    
+
     window.__testingLibraryReviver = ${reviver.toString()};
+    ${TestingLibraryDeserializedFunction.toString()};
   `
 }
 

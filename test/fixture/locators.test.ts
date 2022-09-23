@@ -40,26 +40,59 @@ test.describe('lib/fixture.ts (locators)', () => {
       expect(await locator.textContent()).toEqual('Hello h1')
     })
 
-    test('supports function style `TextMatch`', async ({screen}) => {
-      const locator = screen.getByText(
-        // eslint-disable-next-line prefer-arrow-callback, func-names
-        function (content, element) {
-          return content.startsWith('Hello') && element?.tagName.toLowerCase() === 'h3'
-        },
-      )
+    test.describe('function `TextMatch` argument', () => {
+      test('supports function style `TextMatch`', async ({screen}) => {
+        const locator = screen.getByText(
+          // eslint-disable-next-line prefer-arrow-callback, func-names
+          function (content, element) {
+            return content.startsWith('Hello') && element?.tagName.toLowerCase() === 'h3'
+          },
+        )
 
-      expect(locator).toBeTruthy()
-      expect(await locator.textContent()).toEqual('Hello h3')
-    })
+        expect(locator).toBeTruthy()
+        expect(await locator.textContent()).toEqual('Hello h3')
+      })
 
-    test('supports arrow function style `TextMatch`', async ({screen}) => {
-      const locator = screen.getByText(
-        (content, element) =>
-          content.startsWith('Hello') && element?.tagName.toLowerCase() === 'h3',
-      )
+      test('supports arrow function style `TextMatch`', async ({screen}) => {
+        const locator = screen.getByText(
+          (content, element) =>
+            content.startsWith('Hello') && element?.tagName.toLowerCase() === 'h3',
+        )
 
-      expect(locator).toBeTruthy()
-      expect(await locator.textContent()).toEqual('Hello h3')
+        expect(locator).toBeTruthy()
+        expect(await locator.textContent()).toEqual('Hello h3')
+      })
+
+      test('allows local function references', async ({screen}) => {
+        const locator = screen.getByText((content, element) => {
+          const isMatch = (c: string, e: Element) =>
+            c.startsWith('Hello') && e.tagName.toLowerCase() === 'h3'
+
+          return element ? isMatch(content, element) : false
+        })
+
+        expect(locator).toBeTruthy()
+        expect(await locator.textContent()).toEqual('Hello h3')
+      })
+
+      test('fails with helpful warning when function references closure scope', async ({
+        screen,
+      }) => {
+        const isMatch = (c: string, e: Element) =>
+          c.startsWith('Hello') && e.tagName.toLowerCase() === 'h3'
+
+        const locator = screen.getByText((content, element) =>
+          element ? isMatch(content, element) : false,
+        )
+
+        await expect(async () => locator.textContent()).rejects.toThrowError(
+          expect.objectContaining({
+            message: expect.stringContaining(
+              'A ReferenceError was thrown when using a function TextMatch',
+            ),
+          }),
+        )
+      })
     })
 
     test('should handle the get* methods', async ({queries: {getByTestId}}) => {
