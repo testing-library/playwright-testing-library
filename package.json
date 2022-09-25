@@ -19,7 +19,7 @@
     "prepare:playwright-test:package": "jscodeshift -t ./playwright-test/rename-imports.ts --extensions=ts --parser=ts ./lib",
     "prepublishOnly": "npm run build",
     "start:standalone": "hover-scripts test",
-    "test": "run-s build:testing-library test:standalone test:fixture",
+    "test": "run-s build:testing-library test:fixture:locator",
     "test:legacy": "run-s build:testing-library test:standalone test:fixture:legacy",
     "test:fixture": "playwright test",
     "test:fixture:legacy": "playwright test test/fixture/element-handles.test.ts",
