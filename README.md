@@ -111,6 +111,42 @@ test('my modal', async ({screen, within}) => {
 })
 ```
 
+#### Chaining
+
+> 🔖 Added in [**4.5.0**](https://github.com/testing-library/playwright-testing-library/releases/tag/v4.5.0)
+
+As an alternative to the `within(locator: Locator)` function you're familiar with from Testing Library, Playwright Testing Library also supports chaining queries together.
+
+All synchronous queries (`get*` + `query*`) return `Locator` instances are augmented with a `.within()` method (`TestingLibraryLocator`). All asynchronous queries (`find*`) return a special `LocatorPromise` that also supports `.within()`. This makes it possible to chain queries, including chaining `get*`, `query*` and `find*` interchangeably.
+
+> ⚠️ Note that including any `find*` query in the chain will make the entire chain asynchronous
+
+##### Synchronous
+
+```ts
+test('chaining synchronous queries', async ({screen}) => {
+  const locator = screen.getByRole('figure').within().findByRole('img')
+
+  expect(await locator.getAttribute('alt')).toEqual('Some image')
+})
+```
+
+##### Synchronous + Asynchronous
+
+```ts
+test('chaining synchronous queries + asynchronous queries', ({screen}) => {
+  //              ↓↓↓↓↓ including any `find*` queries makes the whole chain asynchronous
+  const locator = await screen
+    .getByTestId('modal-container') // Get "modal container" or throw (sync)
+    .within()
+    .findByRole('dialog') // Wait for modal to appear (async, until `asyncUtilTimeout`)
+    .within()
+    .getByRole('button', {name: 'Close'}) // Get close button within modal (sync)
+
+  expect(await locator.textContent()).toEqual('Close')
+})
+```
+
 #### Configuration
 
 The `Locator` query API is configured using Playwright's `use` API. See Playwright's documentation for [global](https://playwright.dev/docs/api/class-testconfig#test-config-use), [project](https://playwright.dev/docs/api/class-testproject#test-project-use), and [test](https://playwright.dev/docs/api/class-test#test-use).
