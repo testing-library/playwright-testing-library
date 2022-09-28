@@ -51,6 +51,8 @@ There are currently a few different ways to use Playwright Testing Library, depe
 
 ### Playwright Test Fixture
 
+> 🔖 Added in [**4.4.0**](https://github.com/testing-library/playwright-testing-library/releases/tag/v4.4.0)
+
 Using the `Locator` Playwright Test (**@playwright/test**) fixture with **@playwright-testing-library/test**.
 
 #### Setup
