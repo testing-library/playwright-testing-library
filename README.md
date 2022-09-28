@@ -92,7 +92,7 @@ test('my form', async ({screen, within}) => {
 
 #### Async Methods
 
-The `findBy` queries work the same way as they do in [Testing Library core](https://testing-library.com/docs/dom-testing-library/api-async) in that they return `Promise<Locator>` and are intended to be used to defer test execution until an element appears on the page.
+The `findBy` queries work the same way as they do in [Testing Library](https://testing-library.com/docs/dom-testing-library/api-async) core in that they return `Promise<Locator>` and are intended to be used to defer test execution until an element appears on the page.
 
 ```ts
 test('my modal', async ({screen, within}) => {
