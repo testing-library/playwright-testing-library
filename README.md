@@ -45,7 +45,7 @@ npm install --save-dev playwright-testing-library
 
 ## 📝 Usage
 
-There are currently a few different ways to use Playwright Testing Library, depending on how you use Playwright. However, the recommended approach is using the `Locator` [queries fixture](#playwright-test-fixture) with Playwright Test (**@playwright/test**).
+There are currently a few different ways to use Playwright Testing Library, depending on how you use Playwright. However, the recommended approach is to use the `Locator` [queries fixture](#playwright-test-fixture) with Playwright Test (**@playwright/test**).
 
 > ⚠️ The `ElementHandle` query APIs were created before Playwright introduced its `Locator` API and will be replaced in the next major version of Playwright Testing Library. If you can't use **@playwright/test** at the moment, you'll need to use the `ElementHandle` query API, but a migration path will be provided when we switch to the new `Locator` APIs.
 
@@ -117,7 +117,7 @@ test('my modal', async ({screen, within}) => {
 
 As an alternative to the `within(locator: Locator)` function you're familiar with from Testing Library, Playwright Testing Library also supports chaining queries together.
 
-All synchronous queries (`get*` + `query*`) return `Locator` instances are augmented with a `.within()` method (`TestingLibraryLocator`). All asynchronous queries (`find*`) return a special `LocatorPromise` that also supports `.within()`. This makes it possible to chain queries, including chaining `get*`, `query*` and `find*` interchangeably.
+All synchronous queries (`get*` + `query*`) return `Locator` instances augmented with a `.within()` method (`TestingLibraryLocator`). All asynchronous queries (`find*`) return a special `LocatorPromise` that also supports `.within()`. This makes it possible to chain queries, including chaining `get*`, `query*` and `find*` interchangeably.
 
 > ⚠️ Note that including any `find*` query in the chain will make the entire chain asynchronous
 
