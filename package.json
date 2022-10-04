@@ -54,12 +54,12 @@
     "wait-for-expect": "^3.0.2"
   },
   "devDependencies": {
-    "@hover/javascript": "^6.53.0",
+    "@hover/javascript": "7.0.0-beta.6",
     "@playwright/test": "^1.25.0",
     "@rollup/plugin-commonjs": "^21.0.0",
     "@rollup/plugin-node-resolve": "^13.0.5",
     "@rollup/plugin-replace": "^4.0.0",
-    "@types/jest": "^27.0.2",
+    "@types/jest": "^29.0.3",
     "@types/jscodeshift": "^0.11.2",
     "generate-export-aliases": "^1.1.0",
     "husky": "^8.0.1",
