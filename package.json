@@ -54,7 +54,7 @@
     "wait-for-expect": "^3.0.2"
   },
   "devDependencies": {
-    "@hover/javascript": "^6.53.0",
+    "@hover/javascript": "^7.0.0",
     "@playwright/test": "^1.25.0",
     "@rollup/plugin-commonjs": "^21.0.0",
     "@rollup/plugin-node-resolve": "^13.0.5",
