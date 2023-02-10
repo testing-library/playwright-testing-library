@@ -36,7 +36,7 @@ jobs:
       - name: Update to npm 7
         run: npm i -g npm@7 --registry=https://registry.npmjs.org
 
-      - uses: actions/cache@v3.0.10
+      - uses: actions/cache@v3.2.5
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
