@@ -1,6 +1,8 @@
 > 😲 **Heads up** — Playwright introduced native Testing Library queries in version **[1.27](https://playwright.dev/docs/release-notes#locators)**.
 >
 > 💬 [**#558**](https://github.com/testing-library/playwright-testing-library/issues/558) ← We're discussing what this means for Playwright Testing Library in [this issue](https://github.com/testing-library/playwright-testing-library/issues/558). You can find a more detailed comparison of the new Playwright API and this library [here](https://github.com/testing-library/playwright-testing-library/issues/558#issuecomment-1273969028). Please ask any questions you may have or share thoughts and suggestions!
+>
+> 📑 **Archived** — This project has officially been archived. Use Playwright **1.27+** with the built-in Testing Library support. See the above issues for more details and [this comment](https://github.com/testing-library/playwright-testing-library/issues/558#issuecomment-1274320017) for help migrating.
 
 <br>
 
